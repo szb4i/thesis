@@ -2,9 +2,60 @@
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
 \chapter{Introduction}\label{chapter:introduction}
-In this chapter, the theoretical background of the thesis is introduced. First, \gls{dva} is described briefly, then it is shown how \gls{dsa} differs from the prior approach. Next, it is shown how intensity transformations can be utilized to enhance crucial image features. Later, spatial and frequency domain filtering techniques are presented. In the end of the chapter, further methods are discussed which do not fall into the previously mentioned categories.
+In this chapter, the theoretical background of the thesis is written. First, the basics of X-ray radiography is introduced, then Digital Subtraction Angiography (\gls{dsa}) is described briefly and it is shown how Digital Variance Angiography (\gls{dva}) differs from the prior approach. Next, it is shown how intensity transformations can be utilized to enhance crucial image features. Later, spatial and frequency domain filtering techniques are presented. In the end of the chapter, further methods are discussed which do not fall into the previously mentioned categories.
+
+\section{X-ray Radiography}
+X-ray radiography is a powerful tool used in medical imaging. It is a non-invasive imaging technique that uses a beam of X-rays to create an images of the inside of the body relatively fast. X-ray is a form of electromagnetic radiation which has a wavelength ranging from about $10^{-8}\:m$ to $ 10^{-12}\:m$ (from $3\:\cdot\:10^{16}\:Hz$ to $3\:\cdot\:10^{19}\:Hz$) and energy between 20 - 120 $keV$ \cite{rontgen1896new}. 
+
+There are several interactions possible when X-rays interact with matter \cite{seibert2005x}. Here we only discuss the effects of photoelectric absorption and Compton scattering to beam attenuation as these are the most dominant factors in the energy range of medical imaging (Figure \ref{fig:cross-section}).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/intro/cross-section.JPG}
+  \caption{Various X-ray cross sections as function of energy for Calcium} \label{fig:cross-section}
+\end{figure}
+
+Assuming an inhomogeneous sample and a monoenergetic beam, Lambert-Beer's law can be expressed as:
+\begin{equation}
+    I(d)=I_0\cdot\exp(-\int_{0}^{d}\mu(s)\cdot d(s))
+    \label{eq:labmert-beer}
+\end{equation}
+\begin{equation}
+    p(d)=-\ln(\frac{I(d)}{I_0})=\int_{0}^{d}\mu(s)\cdot ds
+    \label{eq:line-integral}
+\end{equation}
+
+
+\emph{p(d)} is called the line integral. \emph{I(d)} is the intensity in distance \emph{d} behind the initial intensity \emph{I(0)}. \emph{\textmu (s)} is the mass attenuation coefficient, which is composed by cross sections of different interactions. In X-ray radiography, the beam is leaving the X-ray tube with the initial intensity \emph{I(0)}, then interacts with tissues of various mass attenuation coefficients (\emph{\textmu (s)}).  As it reaches the detector, the initial intensity is reduced to \emph{I(d)}.
+
+Based on equation \ref{eq:line-integral}, it can be explained that materials with higher \emph{\textmu} values are more visible on X-ray images. In the human body, these materials with high \emph{\textmu} are mostly bones. Figure \ref{fig:attenuation-for-bone-and-tissue} compares \emph{\textmu} of bones and soft tissue. In the diagnostic energy range, bone contributes the most significantly to the total attenuation, therefore it is the most visible tissue on the final image.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/intro/attenuation-for-bone-and-tissue.png}
+  \caption{The mass attenuation coefficient as a function of photon energy for bone and soft tissue within the diagnostic energy ranges (30–150 $keV$) \cite{kim2013optimal}} \label{fig:attenuation-for-bone-and-tissue}
+\end{figure}
+
+As a conclusion, visualizing vessel structure is not possible using traditional X-ray radiography. To solve this issue, angiography has been evolved.
 
 \section{Angiography}
+In Angiography, a contrast agent is injected into the blood vessel. On of the most popular types of these contrast agents are iodine-based contrast media. As Figure \ref{fig:attenuation-for-several-materials} shows, the mass attenuation coefficient of iodine is relatively high compared to the tissues in the human body. Utilizing this attribute of iodine, visualization of vessels is possible for that short time when the contrast agent expands in the human body right after injection.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/intro/attenuation-for-several-materials.png}
+  \caption{The mass attenuation coefficient as a function of photon energy for several materials encountered in diagnostic X-ray imaging \cite{seibert2005x}} \label{fig:attenuation-for-several-materials}
+\end{figure}
+
+There are different methods to create a final image containing blood vessels only (angiogram). First, the more popular technique, Digital Subtraction Angiography (\gls{dsa}) is discussed.
+
+
+
+\subsection{Digital Variance Angiography}
+hello
+
+\subsection{Digital Subtraction Angiography}
+hello
+
 
 \section{Section}
 Citation test (with Biber)~\parencite{latex}.
