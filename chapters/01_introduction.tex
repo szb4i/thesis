@@ -46,15 +46,26 @@ In Angiography, a contrast agent is injected into the blood vessel. On of the mo
   \caption{The mass attenuation coefficient as a function of photon energy for several materials encountered in diagnostic X-ray imaging \cite{seibert2005x}} \label{fig:attenuation-for-several-materials}
 \end{figure}
 
-There are different methods to create a final image containing blood vessels only (angiogram). First, the more popular technique, Digital Subtraction Angiography (\gls{dsa}) is discussed.
+There are different methods to acquire the final image containing blood vessels only (angiogram). First, the more popular technique, Digital Subtraction Angiography (\gls{dsa}) is discussed.
 
+\subsection{Digital Subtraction Angiography}
+As digitization of images was introduced and manipulation of digitized information became widely used in the 1970s, Digital Subtraction Angiography (\gls{dsa}) became practical \cite{jeans1990development}. In this method, an image is taken before injecting the contrast agent into the blood vessel. Later, this pre-contrast image is being subtracted from the images acquired at different times during the movement of the contrast agent so that only structures filled with  the agent are visualized and irrelevant anatomic features disappear \cite{levin1984digital}. Such procedure can be seen on Figure \ref{fig:/angio-frames}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/angio-frames.png}
+  \caption{Frames captured at different times and the \gls{dsa} image} \label{fig:/angio-frames}
+\end{figure}
+
+\gls{dsa} is a potent imaging technique that can give precise details about the structure and operation of the vascular system. It can be used to identify a variety of vascular conditions, including aneurysms \cite{chappell2003comparison}, peripheral artery disease \cite{fleischmann2006ct}  and coronary artery disease \cite{ambrose1988angiographic}.
+
+Unfortunately, the procedure has some drawbacks. The injection of contrast material is one of the most common risks associated with \gls{dsa}. While the material is generally safe, allergic reactions or other adverse reactions are possible \cite{tramer2006pharmacological}. Another concern is the radiation exposure induced by X-rays, which should always be minimized in medical applications \cite{lange2006randomized}. Digital variance angiography is a viable solution to these issues.
 
 
 \subsection{Digital Variance Angiography}
-hello
 
-\subsection{Digital Subtraction Angiography}
-hello
+Digital variance angiography considers the variation that occurs during picture acquisition. Instead of capturing a single fully exposed image during the procedure, several underexposed images are taken.
+
 
 
 \section{Section}
