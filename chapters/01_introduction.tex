@@ -66,121 +66,74 @@ Unfortunately, the procedure has some drawbacks. The injection of contrast mater
 
 Digital variance angiography considers the variation that occurs during picture acquisition. Instead of capturing a single fully exposed image during the procedure, several underexposed images are taken.
 
+\section{Image Processing}
 
+An image can be thought of as a two-dimensional function, $f (x, y)$ where $x$ and $y$ are spatial coordinates. The intensity of the image is defined as the amplitude of $f$ at any given pair of coordinates $(x, y)$. We refer to the image as a digital image when $x$, $y$ and the intensity values of $f$ are all finite, discrete quantities. Processing digital images using a computer is referred to as the field of digital image processing \cite{gonzalez2018digital}.
 
-\section{Section}
-Citation test (with Biber)~\parencite{latex}.
+\subsection{Filtering in Spatial Domain}
 
-\subsection{Subsection}
+Spatial filtering refers to transformation techniques based on direct manipulation of pixels in an image. One method is to apply intensity transformations, which are expressed as follows:
 
-See~\autoref{tab:sample}, \autoref{fig:sample-drawing}, \autoref{fig:sample-plot}, \autoref{fig:sample-listing}, \autoref{fig:tum}, \autoref{fig:tumslide}.
+\begin{equation}
+    g(x,y)=T[f(x,y)]
+    \label{eq:intensity-transform}
+\end{equation}
 
-\begin{table}[htpb]
-  \caption[Example table]{An example for a simple table.}\label{tab:sample}
+where $f(x,y)$ is the input image, $g(x,y)$ is the output image and $T$ is an operator on $f$ defined over a neighborhood of point $(x,y)$. When a neighborhood is of size 1x1, $g$ is determined solely by the value of $f$ at a single point $(x,y)$ and $T$ can be reduced to the form:
+
+\begin{equation}
+    s=T(r)
+    \label{eq:intensity-transform-simplified}
+\end{equation}
+
+where $s$ and $r$ denote the intensity after and before the intensity transformation respectively.  The simplest intensity transformations are contrast stretching and thresholding which can be seen on Figure \ref{fig:/stretching-and-thresholding}. By utilizing these methods, one can achieve higher contrast than the original. Also, binary images can be created if $T$ is a thresholding function.
+
+\begin{figure}[ht]
   \centering
-  \begin{tabular}{l l l l}
-    \toprule
-      A & B & C & D \\
-    \midrule
-      1 & 2 & 1 & 2 \\
-      2 & 3 & 2 & 3 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\begin{figure}[htpb]
-  \centering
-  % This should probably go into a file in figures/
-  \begin{tikzpicture}[node distance=3cm]
-    \node (R0) {$R_1$};
-    \node (R1) [right of=R0] {$R_2$};
-    \node (R2) [below of=R1] {$R_4$};
-    \node (R3) [below of=R0] {$R_3$};
-    \node (R4) [right of=R1] {$R_5$};
-
-    \path[every node]
-      (R0) edge (R1)
-      (R0) edge (R3)
-      (R3) edge (R2)
-      (R2) edge (R1)
-      (R1) edge (R4);
-  \end{tikzpicture}
-  \caption[Example drawing]{An example for a simple drawing.}\label{fig:sample-drawing}
+  \includegraphics[width=0.7\textwidth]{figures/intro/stretching-and-thresholding.png}
+  \caption{Intensity stretching and thresholding \cite{gonzalez2018digital}} \label{fig:/stretching-and-thresholding}
 \end{figure}
 
-\begin{figure}[htpb]
-  \centering
+If the majority of an image's details are concentrated in a dark, narrow region of the histogram, using power law transformation can significantly improve visibility. These transformations can be expressed as the following:
 
-  \pgfplotstableset{col sep=&, row sep=\\}
-  % This should probably go into a file in data/
-  \pgfplotstableread{
-    a & b    \\
-    1 & 1000 \\
-    2 & 1500 \\
-    3 & 1600 \\
-  }\exampleA
-  \pgfplotstableread{
-    a & b    \\
-    1 & 1200 \\
-    2 & 800 \\
-    3 & 1400 \\	
-  }\exampleB
-  % This should probably go into a file in figures/
-  \begin{tikzpicture}
-    \begin{axis}[
-        ymin=0,
-        legend style={legend pos=south east},
-        grid,
-        thick,
-        ylabel=Y,
-        xlabel=X
-      ]
-      \addplot table[x=a, y=b]{\exampleA};
-      \addlegendentry{Example A};
-      \addplot table[x=a, y=b]{\exampleB};
-      \addlegendentry{Example B};
-    \end{axis}
-  \end{tikzpicture}
-  \caption[Example plot]{An example for a simple plot.}\label{fig:sample-plot}
+\begin{equation}
+    s=r^{\gamma}
+    \label{eq:power-law}
+\end{equation}
+
+where $\gamma$ is a positive constant which can be tuned for the desired needs as shown on Figure \ref{fig:/power-law}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/power-law.png}
+  \caption{Power law transformations with various $\gamma$ values \cite{tree-img}}
+  \label{fig:/power-law}
 \end{figure}
 
-\begin{figure}[htpb]
+
+Another effective way to enhance the global contrast of images is applying histogram equalization. The basic idea is to distribute intensities more evenly when the image is represented by a narrow range of intensity values. Figure \ref{fig:/unequalized_hist} shows an image with its histogram.  The histogram is constrained to a narrow region which results poor contrast.
+
+\begin{figure}[ht]
   \centering
-  \begin{tabular}{c}
-  \begin{lstlisting}[language=SQL]
-    SELECT * FROM tbl WHERE tbl.str = "str"
-  \end{lstlisting}
-  \end{tabular}
-  \caption[Example listing]{An example for a source code listing.}\label{fig:sample-listing}
+  \includegraphics[width=1\textwidth]{figures/intro/unequalized_hist.png}
+  \caption{Original image and its histogram \cite{capper2006unequalized} \cite{bradski2000opencv} }
+  \label{fig:/unequalized_hist}
 \end{figure}
 
-\begin{figure}[htpb]
+Ideally, the cumulative distribution function  \gls{cdf} is linearized across the value range. During histogram equalization, the values from the original narrow range are being mapped to the full range. Here, only the output is shown, the step-by-step algorithm can be found in the references \cite{gonzalez2018digital}.
+
+\begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\textwidth]{tum}
-  \caption[Something else can be written here for listing this, otherwise the caption will be written!]{Includegraphics searches for the filename without extension first in logos, then in figures.} \label{fig:tum}
+  \includegraphics[width=1\textwidth]{figures/intro/equalized_hist.png}
+  \caption{Equalized image and its histogram \cite{bradski2000opencv}}
+  \label{fig:/equalized_hist}
 \end{figure}
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.8\textwidth]{figures/tum}
-  \caption{For pictures with the same name, the direct folder needs to be chosen.} \label{fig:tumslide}
-\end{figure}
+When equalization is not performed globally, this method can be more effective.
 
-\begin{figure}[!tbp]
-  \centering
-  \subfloat[TUM Logo][The logo.]{\includegraphics[height=0.2\textheight]{tum}\label{fig:tum1}}
-  \hfill
-  \subfloat[TUM Slide][The famous slide.]{\includegraphics[height=0.2\textheight]{figures/tum}\label{fig:tum2}}
-  \caption{Two TUM pictures side by side.}
-  \label{fig:sidebyside}
-\end{figure}
 
-This is how the glossary will be used.
 
-\Glspl{ddye}, \gls{r0}, \gls{R0}, and \gls{kdeac}. Also, the \glspl{tum} has many \glspl{computer}, not only one \Gls{computer}. Subsequent acronym usage will only print the short version of \glspl{tuma} (take care of plural, if needed!), like here with \gls{tuma}, too. It can also be --> \glsdisp{tum}{hidden}\footnote{Example for a hidden TUM glossary entry.} <--.
 
-\todo{Now it is your turn to write your thesis.
+\subsection{Filtering in Fourier Domain}
 
-This will be a few tough weeks.}
-
-%\done{Nevertheless, celebrate it when it is done!}
+hello
