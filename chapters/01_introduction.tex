@@ -9,7 +9,7 @@ X-ray radiography is a powerful tool used in medical imaging. It is a non-invasi
 
 There are several interactions possible when X-rays interact with matter \cite{seibert2005x}. Here we only discuss the effects of photoelectric absorption and Compton scattering to beam attenuation as these are the most dominant factors in the energy range of medical imaging (Figure \ref{fig:cross-section}).
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/intro/cross-section.JPG}
   \caption{Various X-ray cross sections as function of energy for Calcium} \label{fig:cross-section}
@@ -29,7 +29,8 @@ Assuming an inhomogeneous sample and a monoenergetic beam, Lambert-Beer's law ca
 \emph{p(d)} is called the line integral. \emph{I(d)} is the intensity in distance \emph{d} behind the initial intensity \emph{I(0)}. \emph{\textmu (s)} is the mass attenuation coefficient, which is composed by cross sections of different interactions. In X-ray radiography, the beam is leaving the X-ray tube with the initial intensity \emph{I(0)}, then interacts with tissues of various mass attenuation coefficients (\emph{\textmu (s)}).  As it reaches the detector, the initial intensity is reduced to \emph{I(d)}.
 
 Based on equation \ref{eq:line-integral}, it can be explained that materials with higher \emph{\textmu} values are more visible on X-ray images. In the human body, these materials with high \emph{\textmu} are mostly bones. Figure \ref{fig:attenuation-for-bone-and-tissue} compares \emph{\textmu} of bones and soft tissue. In the diagnostic energy range, bone contributes the most significantly to the total attenuation, therefore it is the most visible tissue on the final image.
-\begin{figure}[ht]
+
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.5\textwidth]{figures/intro/attenuation-for-bone-and-tissue.png}
   \caption{The mass attenuation coefficient as a function of photon energy for bone and soft tissue within the diagnostic energy ranges (30–150 $keV$) \cite{kim2013optimal}} \label{fig:attenuation-for-bone-and-tissue}
@@ -40,7 +41,7 @@ As a conclusion, visualizing vessel structure is not possible using traditional 
 \section{Angiography}
 In Angiography, a contrast agent is injected into the blood vessel. On of the most popular types of these contrast agents are iodine-based contrast media. As Figure \ref{fig:attenuation-for-several-materials} shows, the mass attenuation coefficient of iodine is relatively high compared to the tissues in the human body. Utilizing this attribute of iodine, visualization of vessels is possible for that short time when the contrast agent expands in the human body right after injection.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.7\textwidth]{figures/intro/attenuation-for-several-materials.png}
   \caption{The mass attenuation coefficient as a function of photon energy for several materials encountered in diagnostic X-ray imaging \cite{seibert2005x}} \label{fig:attenuation-for-several-materials}
@@ -51,7 +52,7 @@ There are different methods to acquire the final image containing blood vessels 
 \subsection{Digital Subtraction Angiography}
 As digitization of images was introduced and manipulation of digitized information became widely used in the 1970s, Digital Subtraction Angiography (\gls{dsa}) became practical \cite{jeans1990development}. In this method, an image is taken before injecting the contrast agent into the blood vessel. Later, this pre-contrast image is being subtracted from the images acquired at different times during the movement of the contrast agent so that only structures filled with  the agent are visualized and irrelevant anatomic features disappear \cite{levin1984digital}. Such procedure can be seen on Figure \ref{fig:/angio-frames}.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/angio-frames.png}
   \caption{Frames captured at different times and the \gls{dsa} image} \label{fig:/angio-frames}
@@ -88,7 +89,7 @@ where $f(x,y)$ is the input image, $g(x,y)$ is the output image and $T$ is an op
 
 where $s$ and $r$ denote the intensity after and before the intensity transformation respectively.  The simplest intensity transformations are contrast stretching and thresholding which can be seen on Figure \ref{fig:/stretching-and-thresholding}. By utilizing these methods, one can achieve higher contrast than the original. Also, binary images can be created if $T$ is a thresholding function.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.7\textwidth]{figures/intro/stretching-and-thresholding.png}
   \caption{Intensity stretching and thresholding \cite{gonzalez2018digital}} \label{fig:/stretching-and-thresholding}
@@ -103,7 +104,7 @@ If the majority of an image's details are concentrated in a dark, narrow region 
 
 where $\gamma$ is a positive constant which can be tuned for the desired needs as shown on Figure \ref{fig:/power-law}.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/power-law.png}
   \caption{Power law transformations with various $\gamma$ values \cite{tree-img}}
@@ -113,7 +114,7 @@ where $\gamma$ is a positive constant which can be tuned for the desired needs a
 
 Another effective way to enhance the global contrast of images is applying histogram equalization. The basic idea is to distribute intensities more evenly when the image is represented by a narrow range of intensity values. Figure \ref{fig:/unequalized_hist} shows an image with its histogram.  The histogram is constrained to a narrow region which results poor contrast.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/unequalized_hist.png}
   \caption{Original image and its histogram \cite{capper2006unequalized} \cite{bradski2000opencv} }
@@ -122,7 +123,7 @@ Another effective way to enhance the global contrast of images is applying histo
 
 Ideally, the cumulative distribution function  \gls{cdf} is linearized across the value range. During histogram equalization, the values from the original narrow range are being mapped to the full range. Here, only the output is shown, the step-by-step algorithm can be found in the references \cite{gonzalez2018digital}.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/equalized_hist.png}
   \caption{Equalized image and its histogram \cite{bradski2000opencv}}
@@ -131,7 +132,7 @@ Ideally, the cumulative distribution function  \gls{cdf} is linearized across th
 
 However, when the approach is applied globally, the final output might not be as desired. As it can be seen on Figure \ref{fig:/global-hist-eq}, the dark background's fine details are emphasized, but the characteristics of the face are lost in the foreground. One solution can be applying histogram equalization locally in order to preserve previously visible features while exposing predominantly hidden ones.
 
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/intro/global-hist-eq.png}
   \caption{Side effects of global histogram equalization \cite{bradski2000opencv}}
@@ -140,15 +141,14 @@ However, when the approach is applied globally, the final output might not be as
 
 The suggested approach is called \gls{clahe} (Contrast Limited Adaptive Histogram Equalization) \cite{pizer1987adaptive}. Instead of equalizing the histogram globally, the image is partitioned into equal-sized regions known as tiles, each of which is subjected to individual histogram equalization as previously demonstrated. By simply doing so, noise might be amplified in near-constant regions. To prevent this, before applying histogram equalization, pixels that are above the given contrast limit in any histogram bin are clipped and evenly distributed to other bins. Finally, tile boundary artifacts are eliminated using bilinear interpolation. The outcome is shown in Figure \ref{fig:/intro-clahe}. While histogram equalization enhanced successfully the visibility of the dark background, there was also a slight improvement in the visibility of the face in the foreground.
 
-As it was covered in this subsection, intensity transformations provide a useful toolkit when contrast enhancement is required. However, if image smoothing or sharpening is desired, spatial filtering must be used.
-
-
-\begin{figure}[ht]
+\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/intro/clahe.png}
   \caption{\gls{clahe} with clipLimit=2.0 and tileGridSize=(8,8)  \cite{bradski2000opencv}}
   \label{fig:/intro-clahe}
 \end{figure}
+
+As it was covered in this subsection, intensity transformations provide a useful toolkit when contrast enhancement is required. However, if image smoothing or sharpening is desired, spatial filtering must be used.
 
 
 \subsection{Filtering in Spatial Domain}
