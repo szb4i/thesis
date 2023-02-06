@@ -70,9 +70,9 @@ Digital variance angiography considers the variation that occurs during picture 
 
 An image can be thought of as a two-dimensional function, $f (x, y)$ where $x$ and $y$ are spatial coordinates. The intensity of the image is defined as the amplitude of $f$ at any given pair of coordinates $(x, y)$. We refer to the image as a digital image when $x$, $y$ and the intensity values of $f$ are all finite, discrete quantities. Processing digital images using a computer is referred to as the field of digital image processing \cite{gonzalez2018digital}.
 
-\subsection{Filtering in Spatial Domain}
+\subsection{Intensity Transformations}
 
-Spatial filtering refers to transformation techniques based on direct manipulation of pixels in an image. One method is to apply intensity transformations, which are expressed as follows:
+The following is the general formula for intensity transformations:
 
 \begin{equation}
     g(x,y)=T[f(x,y)]
@@ -129,11 +129,32 @@ Ideally, the cumulative distribution function  \gls{cdf} is linearized across th
   \label{fig:/equalized_hist}
 \end{figure}
 
-When equalization is not performed globally, this method can be more effective.
+However, when the approach is applied globally, the final output might not be as desired. As it can be seen on Figure \ref{fig:/global-hist-eq}, the dark background's fine details are emphasized, but the characteristics of the face are lost in the foreground. One solution can be applying histogram equalization locally in order to preserve previously visible features while exposing predominantly hidden ones.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/intro/global-hist-eq.png}
+  \caption{Side effects of global histogram equalization \cite{bradski2000opencv}}
+  \label{fig:/global-hist-eq}
+\end{figure}
+
+The suggested approach is called \gls{clahe} (Contrast Limited Adaptive Histogram Equalization) \cite{pizer1987adaptive}. Instead of equalizing the histogram globally, the image is partitioned into equal-sized regions known as tiles, each of which is subjected to individual histogram equalization as previously demonstrated. By simply doing so, noise might be amplified in near-constant regions. To prevent this, before applying histogram equalization, pixels that are above the given contrast limit in any histogram bin are clipped and evenly distributed to other bins. Finally, tile boundary artifacts are eliminated using bilinear interpolation. The outcome is shown in Figure \ref{fig:/intro-clahe}. While histogram equalization enhanced successfully the visibility of the dark background, there was also a slight improvement in the visibility of the face in the foreground.
+
+As it was covered in this subsection, intensity transformations provide a useful toolkit when contrast enhancement is required. However, if image smoothing or sharpening is desired, spatial filtering must be used.
 
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/intro/clahe.png}
+  \caption{\gls{clahe} with clipLimit=2.0 and tileGridSize=(8,8)  \cite{bradski2000opencv}}
+  \label{fig:/intro-clahe}
+\end{figure}
 
+
+\subsection{Filtering in Spatial Domain}
+
+hello from spatial domain
 
 \subsection{Filtering in Fourier Domain}
 
-hello
+hello from fourier domain
