@@ -153,7 +153,63 @@ As it was covered in this subsection, intensity transformations provide a useful
 
 \subsection{Filtering in Spatial Domain}
 
-hello from spatial domain
+Spatial ﬁltering modiﬁes an image by replacing the value of each pixel by a function of the values of the pixel and its neighbors \cite{gonzalez2018digital}. The general formula for linear spatial filtering can be written in these forms:
+
+\begin{equation}
+	g(x,y)=\sum_{s=-a}^{a}\sum_{t=-b}^{b}w(s,t)f(x+s,y+t)
+	\label{eq:correlation}
+\end{equation}
+
+\begin{equation}
+	g(x,y)=\sum_{s=-a}^{a}\sum_{t=-b}^{b}w(s,t)f(x-s,y-t)
+	\label{eq:convolution}
+\end{equation}
+
+where $g(x,y)$ is the output pixel, $w$ is the kernel, $f(x,y)$ is a pixel of the original image, $s$ is the index iterating in the vertical direction within distance $2a$ and $t$ is the index iterating in the horizontal direction within distance $2b$. Here, odd-sized, symmetric kernels are discussed, mostly 3x3. Figure \ref{fig:/convolution} illustrates the process.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/intro/convolution.png}
+  \caption{The mechanics of linear spatial ﬁltering using a 3 × 3 kernel \cite{basavarajaiah2019convolution}}
+  \label{fig:/convolution}
+\end{figure}
+
+The method consists of moving the kernel's center over an image and computing the product sum at each position. Essentially, Equation \ref{eq:correlation} is a correlation between the kernel and the image. In Equation \ref{eq:convolution}, which is known as convolution, minus signs are used in the arguments of $f$. However, convolution and correlation provide the same result when the kernel is symmetric. In this thesis, convolution, Equation \ref{eq:convolution}, is preferred and used subsequently.
+
+Many times, one wishes to blur or sharpen an image. First, it is covered how the prior can be obtained. The most convenient kernel for this purpose is a lowpass gaussian kernel:
+
+\begin{equation}
+	w(s,t)=e^{-\frac{s^{2}+t^{2}}{2\sigma^{2}}}
+	\label{eq:lowpass-gaussian-spatial}
+\end{equation}
+
+where $\sigma$ is the standard deviation.  As the numerator of the exponent represents the distance from the center of the kernel, the expression can be simplified to the following form:
+
+\begin{equation}
+	w(r)=Ke^{-\frac{r^{2}}{2\sigma^{2}}}
+	\label{eq:lowpass-gaussian-spatial-r}
+\end{equation}
+
+where $r$ is the distance from the center of the kernel. In image processing, filter kernels are used in their discrete forms because images contain finite number of non-zero-sized pixels. Therefore, a 3x3 lowpass gaussian kernel with $\sigma=1$ is used as it can be seen on Figure \ref{fig:/lowpass-gaussian-spatial-discrete}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/intro/lowpass-gaussian.png}
+  \caption{Normalized 3x3 gaussian kernel \cite{gonzalez2018digital}}
+  \label{fig:/lowpass-gaussian-spatial-discrete}
+\end{figure}
+
+Figure \ref{fig:/lowpass-gaussian-example} shows the effects of convolving an image with lowpass gaussian kernels. As it can be seen, bluring is noticeable on the branches of the tree even when the 3x3 kernel is used. The blurring becomes more obvious if the kernel size is extended to 7x7 because the kernel covers more nearby pixels.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/lowpass-gaussian-example.png}
+  \caption{Image convolved with lowpass gaussian kernels \cite{tree-img}}
+  \label{fig:/lowpass-gaussian-example}
+\end{figure}
+
+As it was mentioned earlier, another common image manipulation technique is sharpening.
+
 
 \subsection{Filtering in Fourier Domain}
 
