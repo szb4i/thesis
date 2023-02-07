@@ -208,7 +208,90 @@ Figure \ref{fig:/lowpass-gaussian-example} shows the effects of convolving an im
   \label{fig:/lowpass-gaussian-example}
 \end{figure}
 
-As it was mentioned earlier, another common image manipulation technique is sharpening.
+As it was mentioned earlier, another common image manipulation technique is sharpening. After sharpening, it is expected that sharp visual details, such as edges, become more prominent. The filters used for such purposes are based on first and second order derivatives. First,  for the sake of simplification, the derivative of a 1D function is discussed which can be written as the following:
+
+\begin{equation}
+	\frac{df}{dx} = f(x+1) -f(x) 
+	\label{eq:1st-derivative-1d}
+\end{equation}
+
+By expanding Equation \ref{eq:1st-derivative-1d} to 2D, the following form can be obtained:
+
+\begin{equation}
+	\nabla f =\left[\begin{array}{c}
+	\dfrac{\partial f}{\partial x}\\
+	\\
+	\dfrac{\partial f}{\partial y} \\
+	\end{array}\right]=\left[\begin{array}{c}
+	g_x\\
+	g_y \\
+	\end{array}\right]
+	\label{eq:1st-derivative-2d}
+\end{equation}
+
+where $\nabla f$ is the gradient of the image which is a 2D vector pointing in the direction of the greatest rate of change in $(x, y)$. As noted earlier, discrete implementation of kernel functions is necessary for image processing. For simplification, to represent the pixel location in a specific region, the indexing shown in Figure \ref{fig:kernel-indexing} is used.
+
+\iffalse
+\begin{table}[h!]
+\centering
+\begin{tabular}{ | c | c | c | } 
+  \hline
+  $z_1$ & $z_2$ & $z_3$\\ 
+  \hline
+  $z_4$ & $z_5$ & $z_6$ \\ 
+  \hline
+  $z_7$ & $z_8$ & $z_9$ \\ 
+  \hline
+\end{tabular}
+\caption{Indexing a specific a region}
+\label{table:kernel-indexing}
+\end{table}
+\fi
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.25\textwidth]{figures/intro/kernel-indexing.png}
+  \caption{Indexing a specific a region \cite{gonzalez2018digital}}
+  \label{fig:kernel-indexing}
+\end{figure}
+
+A possible implementation for a pair of 3x3 discretized gradient kernels is the following:
+
+\begin{equation}
+	g_x = \dfrac{\partial f}{\partial x}=(z_7+2z_8+z_9)-(z_1+2z_2+z_3)  
+	\label{eq:1st-derivative-2d-x}
+\end{equation}
+\begin{equation}
+	g_y = \dfrac{\partial f}{\partial y}=(z_3+2z_6+z_9)-(z_1+2z_4+z_7)  
+	\label{eq:1st-derivative-2d-y}
+\end{equation}
+
+These kernels are known as the Sobel operators \cite{kanopoulos1988design}. The kernels displayed on Figure \ref{fig:sobel-kernels} approximate the partial derivative in $x$ and $y$ direction, respectively.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/intro/sobel-kernels.png}
+  \caption{Sobel operators \cite{gonzalez2018digital}}
+  \label{fig:sobel-kernels}
+\end{figure}
+
+When the 1st order derivative is needed, the original image has to be convolved with the two Sobel kernels individually, resulting $g_x$ and $g_y$. From these values, a magnitude image can be calculated the following way:
+
+\begin{equation}
+	M(x,y)=\sqrt[]{g_x^{2}+g_y^{2}}
+	\label{eq:sobel-magnitued}
+\end{equation}
+
+Each steps of this process can been seen on Figure \ref{fig:sobel-tree}. It is clear that whereas $g_y$ emphasizes vertical features, $g_x$ does so for horizontal ones.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/sobel-tree.png}
+  \caption{Using Sobel kernels \cite{tree-img}}
+  \label{fig:sobel-tree}
+\end{figure}
+
+
 
 
 \subsection{Filtering in Fourier Domain}
