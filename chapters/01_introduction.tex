@@ -55,7 +55,7 @@ As digitization of images was introduced and manipulation of digitized informati
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/angio-frames.png}
-  \caption{Frames captured at different times and the \gls{dsa} image} \label{fig:/angio-frames}
+  \caption{Frames captured at different times and the \gls{dsa} image. To remove static anatomical features, the first frame is subtracted from the subsequent frames. The final \gls{dsa} image is obtained by subtracting the first frame from the mean of all frames.} \label{fig:/angio-frames}
 \end{figure}
 
 \gls{dsa} is a potent imaging technique that can give precise details about the structure and operation of the vascular system. It can be used to identify a variety of vascular conditions, including aneurysms \cite{chappell2003comparison}, peripheral artery disease \cite{fleischmann2006ct}  and coronary artery disease \cite{ambrose1988angiographic}.
@@ -65,7 +65,25 @@ Unfortunately, the procedure has some drawbacks. The injection of contrast mater
 
 \subsection{Digital Variance Angiography}
 
-Digital variance angiography considers the variation that occurs during picture acquisition. Instead of capturing a single fully exposed image during the procedure, several underexposed images are taken.
+The key benefit of Digital variance angiography (\gls{dva}) is the new motion-based contrast scheme it introduces, which enables the visualization of structures that are not visible in a traditional X-ray image. Instead of capturing a single fully exposed image during the procedure, several underexposed images are taken. By calculating the variance and the mean for every pixel, two types of images can be obtained. The expected value of the X-ray attenuation represents the static image, which contains the same type of information as the conventional X-ray image. On the other hand,  the variance of the X-ray attenuation represents a new type of image, named kinetic image, reflecting internal motions \cite{szigeti2014motion}.
+
+Figure \ref{fig:clock-kinetic} introduces the previously mentioned static and kinetic images on an alarm clock. The static image (top) shows the electronic circuitry and the mechanics of the clock. In the kinetic image of the same part of the clock (bottom) the still parts disappear, and only moving parts are visualized.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.45\textwidth]{figures/intro/clock-kinetic.png}
+  \caption{X-ray image of a clock. Top: static image. Bottom: kinetic image \cite{szigeti2014motion}} \label{fig:clock-kinetic}
+\end{figure}
+
+Angiography is a promising area for the application of the novel method. As the new information is based on the variance of measured intensities, it is called Digital variance angiography (\gls{dva}). Patient studies showed that \gls{dva} can be  can be used as a substitute for \gls{dsa}. Side-by-side comparison is shown on Figure \ref{fig:dsa-vs-dva}. It is noticeable that \gls{dva} significantly reduces background noise and effectively enhances the vascular contour.  The major advantage of \gls{dva} could be the significant dose reduction. Furthermore, \gls{dva} might help the widespread use of $CO_2$ as a safer contrast agent in clinical practice \cite{orias2019digital}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.65\textwidth]{figures/intro/dsa-vs-dva.png}
+  \caption{Upper row: \gls{dsa}. Lower row: \gls{dva}  \cite{orias2019digital}. Postprocessing techniques were applied on every image  } \label{fig:dsa-vs-dva}
+\end{figure}
+
+Similar to \gls{dsa}, \gls{dva} also requires further postprocessing in order to improve the visibility of the vessel region. The next section introduces several techniques that might be helpful.
 
 \section{Image Processing}
 
@@ -268,7 +286,7 @@ A possible implementation for a pair of 3x3 discretized gradient kernels is the 
 
 These kernels are known as the Sobel operators \cite{kanopoulos1988design}. The kernels displayed on Figure \ref{fig:sobel-kernels} approximate the partial derivative in $x$ and $y$ direction, respectively.
 
-\begin{figure}[htpb]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{figures/intro/sobel-kernels.png}
   \caption{Sobel operators \cite{gonzalez2018digital}}
@@ -291,7 +309,21 @@ Each steps of this process can been seen on Figure \ref{fig:sobel-tree}. It is c
   \label{fig:sobel-tree}
 \end{figure}
 
+In addition to the 1st gradient of an image, the 2nd gradient might also be an effective tool when edge enhancement is desired. It can be written as the following:
 
+\begin{equation}
+	\nabla ^{2} f = \frac{\partial ^{2} f}{\partial x^{2}} + \frac{\partial ^{2} f}{\partial y^{2}}
+	\label{eq:12nd-derivative}
+\end{equation}
+
+where $\nabla ^{2} f$ is the Laplacian of the image. A possible discretized implementation is shown on Figure \ref{fig:laplacian-kernel}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.25\textwidth]{figures/intro/laplacian-kernel.png}
+  \caption{Laplacian kernel \cite{gonzalez2018digital}}
+  \label{fig:laplacian-kernel}
+\end{figure}
 
 
 \subsection{Filtering in Fourier Domain}
