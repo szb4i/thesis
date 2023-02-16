@@ -80,7 +80,7 @@ Angiography is a promising area for the application of the novel method. As the 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.65\textwidth]{figures/intro/dsa-vs-dva.png}
-  \caption{Upper row: \gls{dsa}. Lower row: \gls{dva}  \cite{orias2019digital}. Postprocessing techniques were applied on every image  } \label{fig:dsa-vs-dva}
+  \caption{Upper row: \gls{dsa}. Lower row: \gls{dva}. Postprocessing techniques were applied on every image \cite{orias2019digital}} \label{fig:dsa-vs-dva}
 \end{figure}
 
 Similar to \gls{dsa}, \gls{dva} also requires further postprocessing in order to improve the visibility of the vessel region. The next section introduces several techniques that might be helpful.
@@ -316,7 +316,7 @@ In addition to the 1st gradient of an image, the 2nd gradient might also be an e
 	\label{eq:12nd-derivative}
 \end{equation}
 
-where $\nabla ^{2} f$ is the Laplacian of the image. A possible discretized implementation is shown on Figure \ref{fig:laplacian-kernel}
+where $\nabla ^{2} f$ is the Laplacian of the image. A possible discretized implementation is shown on Figure \ref{fig:laplacian-kernel}.
 
 \begin{figure}[htpb]
   \centering
@@ -325,7 +325,123 @@ where $\nabla ^{2} f$ is the Laplacian of the image. A possible discretized impl
   \label{fig:laplacian-kernel}
 \end{figure}
 
+The output (center image on Figure \ref{eq:laplacian-output}) contains a significant number of pixels with negative values after convolution with the previously used tree image. Setting values below zero to zero is one way to deal with this problem. It can be noticed that the Laplacian filter returns strong response at locations of intensity discontinuities. By adding the result to the original image, the sharpness can be significantly improved as it is shown on the right image of Figure \ref{eq:laplacian-output}. The previously shown algorithm is the implementation of the following equation:
+
+\begin{equation}
+	g(x,y)=f(x,y)+c[\nabla ^{2} f ]
+	\label{eq:laplacian-output}
+\end{equation}
+
+where the sign of $c$ depends on the implementation of the Laplacian kernel. If the center element is negative $c$ needs to be negative too. By changing the magnitude of $c$, the weight of the sharpening can be controlled.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/laplacian-tree.png}
+  \caption{Convolving with Laplacian kernel. $c$ was set to 0.5 \cite{tree-img}}
+  \label{fig:laplacian-tree}
+\end{figure}
+
+Both 1st and 2nd gradient is useful when image sharpening is needed. The two, however, behave in different ways near edges as it is shown on Figure \ref{fig:1st-vs-2nd-gradient}. In constant intensity areas, both derivatives are zero. When reaching the ramp, the 1st derivative is non-zero until the end of the ramp. On the other hand, the second derivative is only non-zero at the start and the end of the ramp. The sign of the second derivative changes at the onset and end of a step or ramp.  As a conclusion, 2nd order gradient highlights fine details better while 1st order gradient enhances prominent edges more effectively.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{figures/intro/1st-vs-2nd-gradient.png}
+  \caption{The behavior of 1st and 2nd gradient near edges \cite{gonzalez2018digital}}
+  \label{fig:1st-vs-2nd-gradient}
+\end{figure}
+
+The prior methods are general transformations. They affect the entire image globally. As a consequence, they enhance both fine details and noise. In order to reduce noise, adaptive spatial filters can be used.  Consider a 3×3 neighborhood around a single center pixel $l(x, y)$ in $I$, where $I(x, y)$ is the input image of the size W×H. The local intensity mean $\mu$ and local signal energy variation $\epsilon$ of the 3×3 neighborhood pixels were deﬁned using the following expressions:
+
+\begin{equation}
+	\mu(x,y)=\frac{1}{N}\sum_{i=-1}^{1	}\sum_{j=-1}^{1	}I(x+i,y+j)
+	\label{eq:local-mean}
+\end{equation}
+\begin{equation}
+	\epsilon(x,y)=\frac{1}{N}\sum_{i=-1}^{1	}\sum_{j=-1}^{1	}(I(x+i,y+j)-\mu(x,y))^{2}
+	\label{eq:local-variance}
+\end{equation}
+
+where $N=9$ is a normalizing constant. Transforming the 3×3 neighborhood elements of the
+kernel operator into a column vector, it can be described as the follwoing:
+
+\begin{equation}
+	\mathbf{x}=[x_{1},x_{2},x_{3},...,x_{9}]^{t}
+	\label{eq:x-column-vector}
+\end{equation}
+
+In its vectorized form, Equation \ref{eq:local-variance} can be rewritten as:
+
+\begin{equation}
+	\epsilon(x,y)=\frac{1}{N^{2}}\mathbf{x}^{t}\mathbf{C}\mathbf{x}
+	\label{eq:local-variance-vectorized}
+\end{equation}
+
+\begin{equation}
+	\mathbf{C}=\begin{bmatrix}
+		8 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1\\
+		-1 & 8 & -1 & -1 & -1 & -1 & -1 & -1 & -1\\
+		-1 & -1 & 8 & -1 & -1 & -1 & -1 & -1 & -1\\
+		-1 & -1 & -1 & 8 & -1 & -1 & -1 & -1 & -1\\
+		-1 & -1 & -1 & -1 & 8 & -1 & -1 & -1 & -1\\
+		-1 & -1 & -1 & -1 & -1 & 8 & -1 & -1 & -1\\
+		-1 & -1 & -1 & -1 & -1 & -1 & 8 & -1 & -1\\
+		-1 & -1 & -1 & -1 & -1 & -1 & -1 & 8 & -1\\
+		-1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 8\\
+	\end{bmatrix}
+	\label{eq:wl-matrix}
+\end{equation}
+
+The vectorized form shown in Equation \ref{eq:local-variance-vectorized} and \ref{eq:wl-matrix} can be useful for implementing the filter in any programming language. However, the following form of Equation \ref{eq:local-variance} expresses the power of the method better:
+
+\begin{equation}
+	\epsilon(x,y)=\frac{1}{N^{2}}[(x_{1}-x_{2})^{2}+(x_{1}-x_{3})^{2}+(x_{1}-x_{4})^{2}+...+(x_{8}-x_{9})^{2}]
+	\label{eq:local-variance-algebraic}
+\end{equation}
+
+With permutation of square differences in the 3×3 kernel pixel values in Equation \ref{eq:local-variance-algebraic}, there exists 36 directive components in the response value. The recommended operator can be considered of as an adaptive operator since, unlike typical filters with constant kernel elements, it uses different kernel elements at various locations throughout the image. It is called the WL operator \cite{lin2018edge}.
+
+Figure \ref{fig:sobel-vs-wl} shows the differences from the Sobel operator. On the WL image, there are less highlighted edges. The lines on the filed an the contour of the clouds are both ignored. Also in the tree region, edge detection is less sensible.
+
+Consider a noisy image as in case of Figure \ref{fig:sobel-vs-wl-noisy}. Compared to Sobel kernels, the WL operator more effectively reduces noise. Therefore it is not clear which operator performs better in general. It has been demonstrated thus far that an adaptive filter may be a better option for noisy photos while an adaptive filter may miss essential information in ideal photographs. Further adaptive methods were tested during the research phase of the thesis \cite{bharodiya2019improved} \cite{tu2009coronary}, however, the same conclusion applies to all.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/intro/sobel-vs-wl.png}
+  \caption{Left: 
+  Sobel image (calculation based on Equation \ref{eq:sobel-magnitued}).\\\hspace{\textwidth}
+  Right: WL image (calculation based on Equation \ref{eq:local-variance-vectorized})  \cite{tree-img}}
+  \label{fig:sobel-vs-wl}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/sobel-vs-wl-noisy.png}
+  \caption{
+  Left: Created by adding noise from normal distribution.\\\hspace{\textwidth}
+  Center: Sobel image (calculation based on Equation \ref{eq:sobel-magnitued}).\\\hspace{\textwidth}
+   Right: WL image (calculation based on Equation \ref{eq:local-variance-vectorized})  \cite{tree-img}
+   }
+  \label{fig:sobel-vs-wl-noisy}
+\end{figure}
+
+The methods that were previously discussed are rather expensive in terms of computation costs if the algorithm is not well optimized. In the next section, a different filtering perspective is discussed which is typically faster than the former and offers a new perspective to handle image components with various frequencies.
 
 \subsection{Filtering in Fourier Domain}
 
-hello from fourier domain
+A function $f(t)$ of a continuous variable $t$ that is periodic with a period $T$ can be expressed as the sum of sines and cosines:
+
+\begin{equation}
+	f(t)=\sum_{k=0}^{\infty}(A_{k}cos(\omega_{k}t)+B_{k}cos(\omega_{k}t))
+	\label{eq:sum-sin-cos}
+\end{equation}
+
+where $\omega_k=\frac{2\pi}{T}$. Utilizing Euler's formula, Equation \ref{eq:sum-sin-cos} can be transformed to:
+
+\begin{equation}
+	f(t)=\sum_{-\infty}^{\infty}c_{n}e^{j\frac{2\pi n}{T}t}
+	\label{eq:sum-sin-cos-euler}
+\end{equation}
+\begin{equation}
+	c_{n}=\frac{1}{T}\int_{-T/2}^{T/2}e^{-j\frac{2\pi n}{T}t}dt
+	\label{eq:sum-sin-cos-euler-normalization}
+\end{equation}
