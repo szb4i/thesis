@@ -428,7 +428,7 @@ The methods that were previously discussed are rather expensive in terms of comp
 
 \subsection{Filtering in Fourier Domain}
 
-A function $f(t)$ of a continuous variable $t$ that is periodic with a period $T$ can be expressed as the sum of sines and cosines:
+The following description of the Fourier domain is based on Book \cite{gonzalez2018digital}.  A function $f(t)$ of a continuous variable $t$ that is periodic with a period $T$ can be expressed as the sum of sines and cosines:
 
 \begin{equation}
 	f(t)=\sum_{k=0}^{\infty}(A_{k}cos(\omega_{k}t)+B_{k}cos(\omega_{k}t))
@@ -445,3 +445,227 @@ where $\omega_k=\frac{2\pi}{T}$. Utilizing Euler's formula, Equation \ref{eq:sum
 	c_{n}=\frac{1}{T}\int_{-T/2}^{T/2}e^{-j\frac{2\pi n}{T}t}dt
 	\label{eq:sum-sin-cos-euler-normalization}
 \end{equation}
+
+The Fourier transform $\mathcal{F}\{f(t)\}$ of a continuous function $f(t)$ of a continuous variable $t$ and the inverse Fourier transform $\mathcal{F}^{-1}\{F(\mu)\}$ of a continuous function $F(\mu)$ of a continuous variable $\mu$  is defined by the following equations:
+
+\begin{equation}
+	\mathcal{F}\{f(t)\}=F(\mu)=\int_{-\infty}^{\infty}f(t)e^{-j2\pi \mu t}dt
+	\label{eq:fourier-transform}
+\end{equation}
+\begin{equation}
+	\mathcal{F}^{-1}\{F(\mu)\}=f(t)=\int_{-\infty}^{\infty}F(\mu)e^{j2\pi \mu t}d\mu
+	\label{eq:inverse-fourier-transform}
+\end{equation}
+
+The domain of the Fourier transform is called the frequency domain ($F(\mu)$), while the original domain is called the spatial domain ($f(t)$). The units of $\mu$ depend on the units of $t$. In case of image processing, $t$ represents distance in meters and therefore the units of $\mu$ are cycles/meter. Figure \ref{fig:box-fourier} shows the Fourier transform of a box function. Inverse relationship can be noticed between the width in spatial domain and the location of zeros in frequency domain. The function in frequency domain extends to infinity in both directions. Furthermore, the discontinuities of $f(t)$ at $-W/2$ and $W/2$ introduces ringing which is the result of the Gibbs phenomenon \cite{gottlieb1997gibbs}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/intro/box-fourier.png}
+  \caption{
+  Left: Box function of width $W$.\\\hspace{\textwidth}
+   Right: Fourier transform of a box function \cite{gonzalez2018digital}.
+   }
+  \label{fig:box-fourier}
+\end{figure}
+
+So far, continuous functions have been observed. However, in image processing one has to deal with discrete functions as pixels have fixed size. Consider a continuous function $f(t)$ and a sampling interval $\triangle T$. One way to model sampling is to multiply $f(t)$ by a sampling function $\triangle T$ units apart. The sampled function can be written as the following:
+
+\begin{equation}
+	\tilde{f}(t)=f(t)s_{\triangle T}(t)=\sum_{-\infty}^{\infty}f(t)\delta (t-n\triangle T)
+	\label{eq:fourier-transform-sampled}
+\end{equation}
+
+where $s_{\triangle T}(t)$ is an impulse train of infinitely many Dirac delta functions (unit impulses) $\triangle T$ units apart. Each component of this summation is an impulse weighted by $f(t)$ which can be expressed the way it is shown in Equation \ref{eq:fourier-transform-sampled-component}. Figure \ref{fig:sampled-function} provides an illustration of sampling.
+
+\begin{equation}
+	f_{k}=\int_{-\infty}^{\infty}f(t)\delta(t-k\triangle T)dt=f(k\triangle T)
+	\label{eq:fourier-transform-sampled-component}
+\end{equation}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/intro/sampled-function.png}
+  \caption{
+	Top: Continuous function.\\\hspace{\textwidth}
+   Center: Train of impulses.\\\hspace{\textwidth}
+	Bottom: Sampled values \cite{gonzalez2018digital}.
+   }
+  \label{fig:sampled-function}
+\end{figure}
+
+To determine the sufficient length of $\triangle T$, one has to know the concept of Nyquist rate \cite{landau1967sampling}. Consider a band-limited function displayed on Figure \ref{fig:band-limited}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/intro/band-limited.png}
+  \caption{
+	Top: Continuous function.\\\hspace{\textwidth}
+	Bottom: Sampled values \cite{gonzalez2018digital}.
+   }
+  \label{fig:band-limited}
+\end{figure}
+
+Sufficient separation of a periodic sequence is possible if the following condition apply:
+
+\begin{equation}
+	\frac{1}{\triangle T}>2\mu_{max}
+	\label{eq:nyquist}
+\end{equation}
+
+It is called the sampling theorem and $\mu_{max}=\frac{1}{2\triangle T}$ is the Nyquist rate which is the minimum frequency required for sufficient recovery. If the above condition is not fulfilled different signals may become indistinguishable. This artifact is known as aliasing.
+
+The previously mentioned theorems can be extended to two dimension space which can be investigated further in Book \cite{gonzalez2018digital}.  Here, only the 2D discrete Fourier transform and its inverse are written respectively as follows:
+
+\begin{equation}
+	F(u,v)=\sum_{x=0}^{M-1}\sum_{y=0}^{N-1}f(x,y)e^{-j2\pi (ux/M + vy/N)}
+	\label{eq:2d-fourier}
+\end{equation}
+\begin{equation}
+	f(x,y)=\frac{1}{MN}\sum_{u=0}^{M-1}\sum_{v=0}^{N-1}F(u,v)e^{j2\pi (ux/M + vy/N)}
+	\label{eq:2d-fourier-inverse}
+\end{equation}
+
+where $f(x, y)$ is a digital image of size $M\times N$. When writing a Python algorithm, all the previously mentioned theory is encapsulated by pre-written functions of many libraries. Appendix \ref{appendix:a} towards the end of the thesis contains a list of all the used dependencies. Figure \ref{code:np-fft} includes the code required to reproduce images on Figure \ref{fig:tree-fourier}.
+
+\begin{figure}[htpb]
+	\centering
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+img_ft = np.fft.fft2(img)
+img_ft_abs = np.log(np.abs(img_ft))
+img_ft_abs_shifted = np.fft.fftshift(img_ft_abs)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Visualization of the Fourier transform}\label{code:np-fft}
+\end{figure}
+
+Variable \emph{img\textunderscore ft} is the discrete Fourier transform of the image. In the next line, the absolute value of the image is taken as the result of the Fourier transform outputs complex values. Furthermore, logarithm function needs to be applied in order to see any information on the output. Otherwise, the output is completely dark. This stage is variable \emph{img\textunderscore ft\textunderscore abs} which is displayed on the center image of Figure \ref{fig:tree-fourier}. As it can be noticed, the zero frequency is located in the upper left corner of the image rather than its center. This is not a mistake, it is how numpy handles the ordering of frequencies. If the traditional visualization is wanted, the frequencies has to be shifted with the \emph{fftshift} method. The result is then saved into variable \emph{img\textunderscore ft\textunderscore abs\textunderscore shifted} which is plotted on on the right image of Figure \ref{fig:tree-fourier}. Hereafter, the same frequency shift is applied on every visualization and the low frequency components are at the center of the frequency domain while the high frequency components are further away in the radial direction.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/tree-fourier.png}
+  \caption{
+	Left: Original image (\emph{img}) \cite{tree-img} \\\hspace{\textwidth}
+	Center: Frequency domain (\emph{img\textunderscore ft\textunderscore abs})  \\\hspace{\textwidth}
+	Right: Shifted frequency domain (\emph{img\textunderscore ft\textunderscore abs\textunderscore shifted})
+   }
+  \label{fig:tree-fourier}
+\end{figure}
+
+Convolution in the frequency domain can be done easily. One needs to apply the convolution theorem which can be expressed as:
+
+\begin{equation}
+	(f \circledast h)(t) \Leftrightarrow (H \cdot F)(\mu)
+	\label{eq:convolution-theorem}
+\end{equation}
+
+where $f$ is the image in spatial domain, $F$ is the image in frequency domain, $h$ is the filter in spatial domain and $H$ is the filter in frequency domain. The $ \circledast$ operator on the left means convolution which was introduced earlier with Equation \ref{eq:convolution}.  As a result, convolution simplifies to a multiplication in frequency domain instead of sliding over the whole image in spatial domain. However, the cost of the discrete Fourier transformation and the inverse discrete Fourier transformation remains a consideration in terms of computational efficiency.  Fortunately, the Fast Fourier Transform (\gls{fft}) technique \cite{brigham1988fast} is quite effective. It reduces the complexity of computing the discrete Fourier transform from $O(N^{2})$ to $O(N \log N)$ where $N$ is the data size. The Python libraries used in the thesis all utilize the power of \gls{fft}.
+
+To create a low-pass filter in frequency domain to highlight edges only, the most plausible solution might be ignoring completely frequency components above a certain distance from the center in frequency space. It is called the ideal low-pass filter (\gls{ilpf}) and it can be expressed as follows:
+
+\begin{equation}
+  H(u,v) =
+    \begin{cases}
+      1 & \text{if $D(u,v) \le D_{0}$}\\
+      0 & \text{if $D(u,v) > D_{0}$}\\
+    \end{cases}       
+    \label{eq:ilpf}
+\end{equation}
+
+where $D(u,v)$ is the distance from the center of the frequency domain and $D_{0}$ is a positive constant. The details of implementation is shown on Figure \ref{code:ilpf}. First, a coordinate system is generated with the discrete Fourier transform sample frequencies $u$ and $v$ matching the shape of the input image. Then, the function $np.meshgrid$ creates coordinate arrays for the $v$ and the $u$ coordinates and saves them into variable $vv$ and $uu$. Finally, \gls{ilpf} is calculated in frequency domain and stored in variable \emph{filter\textunderscore f}. From this point forward, the same procedure is used to generate the required coordinate arrays of the frequency domain and the final line is the same as well where \emph{img\textunderscore filtered} is acquired. Therefore, only \emph{filter\textunderscore f} is present in the following code snippets. Figure \ref{fig:tree-ilpf} displays the filter in use. 
+
+\begin{figure}[htpb]
+	\centering
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+u = np.fft.fftfreq(img.shape[1])
+v = np.fft.fftfreq(img.shape[0])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+D_0 = 0.05
+filter_f = (np.hypot(vv, uu) < D_0)
+img_f = np.fft.fft2(img)
+img_filtered = np.fft.ifft2(img_ft*filter_f).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation and application of Equation \ref{eq:ilpf}}\label{code:ilpf}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/tree-ilpf.png}
+  \caption{
+	Left: Original image \cite{tree-img} \\\hspace{\textwidth}
+	Center: \gls{ilpf} filter in frequency domain  \\\hspace{\textwidth}
+	Right: Filtered image
+   }
+  \label{fig:tree-ilpf}
+\end{figure}
+
+Unfortunately, there is a substantial ringing artifact on the output image (right image on Figure \ref{fig:tree-ilpf}). To better understand the issue, it is necessary to observe the spatial domain kernel of the \gls{ilpf} obtained by calculating the inverse discrete Fourier transform of \gls{ilpf} in frequency domain. An illustration can be seen on Figure \ref{fig:ilpf-ringing}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/ilpf-ringing.png}
+  \caption{
+	Left: \gls{ilpf} in frequency domain \\\hspace{\textwidth}
+	Center: Corresponding spatial domain kernel  \\\hspace{\textwidth}
+	Right: Intensity proﬁle of a horizontal line through the center \cite{gonzalez2018digital}
+   }
+  \label{fig:ilpf-ringing}
+\end{figure}
+
+As a reminder, filtering in the spatial domain is accomplished by convolving the center function in Figure \ref{fig:ilpf-ringing} with the image.  Ringing is primarily caused by the outer part of this spatial function, while blurring is mainly done by the center. The \gls{ilpf} has to be replaced by a function that remains unchanged after an inverse Fourier transform in order to leave the undesirable ringing artifact. An adequate function is Gaussian which can be expressed as follows:
+
+\begin{equation}
+	H(u, v)= e^{-D^{2}(u,v)/2\sigma ^{2}}
+	\label{eq:glpf}
+\end{equation}
+
+where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. The details of implementation are shown on Figure \ref{code:glpf}. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artifact is eliminated while the blurring is accomplished successfully. 
+
+\begin{figure}[htpb]
+	\centering
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+sigma = 1/10
+filter_f = np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of Equation \ref{eq:glpf}}\label{code:glpf}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/tree-glpf.png}
+  \caption{
+	Left: Original image \cite{tree-img} \\\hspace{\textwidth}
+	Center: \gls{glpf} filter in frequency domain  \\\hspace{\textwidth}
+	Right: Filtered image
+   }
+  \label{fig:tree-glpf}
+\end{figure}
+
+Next, high-pass filtering is discussed. In order to create a high-pass filter, the previously introduced \gls{glpf} can be reused. The Gaussian high-pass filter (\gls{ghpf}) can be expressed as it is shown in Equation \ref{eq:ghpf} and the details of implementation can be seen on Figure \ref{code:ghpf}.
+
+\begin{equation}
+	H(u, v)= 1- e^{-D^{2}(u,v)/2\sigma ^{2}}
+	\label{eq:ghpf}
+\end{equation}
+
+\begin{figure}[htpb]
+	\centering
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+sigma = 1/10
+filter_f = 1 - np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of Equation \ref{eq:ghpf}}\label{code:ghpf}
+\end{figure}
+
+
