@@ -424,7 +424,7 @@ Consider a noisy image as in case of Figure \ref{fig:sobel-vs-wl-noisy}. Compare
   \label{fig:sobel-vs-wl-noisy}
 \end{figure}
 
-The methods that were previously discussed are rather expensive in terms of computation costs if the algorithm is not well optimized. In the next section, a different filtering perspective is discussed which is typically faster than the former and offers a new perspective to handle image components with various frequencies.
+The methods that were previously discussed are rather expensive in terms of computation costs if the algorithm is not well optimized. In the next section, a different filtering perspective is discussed which is typically faster than the former and offers a new approach to handle image components with various frequencies.
 
 \subsection{Filtering in Frequency Domain}
 
@@ -526,31 +526,17 @@ The previously mentioned theorems can be extended to two dimension space which c
 	\label{eq:2d-fourier-inverse}
 \end{equation}
 
-where $f(x, y)$ is a digital image of size $M\times N$. When writing a Python algorithm, all the previously mentioned theory is encapsulated by pre-written functions of many libraries. Appendix \ref{appendix:a} towards the end of the thesis contains a list of all the used dependencies. Figure \ref{code:np-fft} includes the code required to reproduce images on Figure \ref{fig:tree-fourier}.
+where $f(x, y)$ is a digital image of size $M\times N$. When writing a Python algorithm, all the previously mentioned theory is encapsulated by pre-written functions of many libraries. Appendix \ref{appendix:a} towards the end of the thesis contains a list of all the used dependencies. Appendix \ref{appendix:b} includes code snippets used in the thesis.
 
-\begin{figure}[htpb]
-	\centering
-	\begin{tabular}{c}
-	\begin{lstlisting}[language=Python]
-import numpy as np		
-img = read_image(...)
-img_ft = np.fft.fft2(img)
-img_ft_abs = np.log(np.abs(img_ft))
-img_ft_abs_shifted = np.fft.fftshift(img_ft_abs)
-	\end{lstlisting}
-	\end{tabular}
-	\caption[Example listing]{Visualization of the Fourier transform}\label{code:np-fft}
-\end{figure}
-
-Variable \emph{img\textunderscore ft} is the discrete Fourier transform of the image. In the next line, the absolute value of the image is taken as the result of the Fourier transform outputs complex values. Furthermore, logarithm function needs to be applied in order to see any information on the output. Otherwise, the output is completely dark. This stage is variable \emph{img\textunderscore ft\textunderscore abs} which is displayed on the center image of Figure \ref{fig:tree-fourier}. As it can be noticed, the zero frequency is located in the upper left corner of the image rather than its center. This is not a mistake, it is how numpy handles the ordering of frequencies. If the traditional visualization is wanted, the frequencies has to be shifted with the \emph{fftshift} method. The result is then saved into variable \emph{img\textunderscore ft\textunderscore abs\textunderscore shifted} which is plotted on on the right image of Figure \ref{fig:tree-fourier}. Hereafter, the same frequency shift is applied on every visualization and the low frequency components are at the center of the frequency domain while the high frequency components are further away in the radial direction.
+Figure \ref{fig:tree-fourier} shows the output of the discrete Fourier transform of an example image. The low frequency components are at the center of the frequency domain while the high frequency components are further away in the radial direction.
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/intro/tree-fourier.png}
+  \includegraphics[width=0.6\textwidth]{figures/intro/tree-fourier.png}
   \caption{
-	Left: Original image (\emph{img}) \cite{tree-img} \\\hspace{\textwidth}
-	Center: Frequency domain (\emph{img\textunderscore ft\textunderscore abs})  \\\hspace{\textwidth}
-	Right: Shifted frequency domain (\emph{img\textunderscore ft\textunderscore abs\textunderscore shifted})
+	Left: Original image  \cite{tree-img} \\\hspace{\textwidth}
+	Right: Image in frequency domain  \\\hspace{\textwidth}
+	Code Snippet \ref{code:fft-shift}
    }
   \label{fig:tree-fourier}
 \end{figure}
@@ -575,25 +561,7 @@ To create a low-pass filter in frequency domain to highlight edges only, the mos
     \label{eq:ilpf}
 \end{equation}
 
-where $D(u,v)$ is the distance from the center of the frequency domain and $D_{0}$ is a positive constant. The details of implementation is shown on Figure \ref{code:ilpf}. First, a coordinate system is generated with the discrete Fourier transform sample frequencies $u$ and $v$ matching the shape of the input image. Then, the function $np.meshgrid$ creates coordinate arrays for the $v$ and the $u$ coordinates and saves them into variable $vv$ and $uu$. Finally, \gls{ilpf} is calculated in frequency domain and stored in variable \emph{filter\textunderscore f}. From this point forward, the same procedure is used to generate the required coordinate arrays of the frequency domain and the final line is the same as well where \emph{img\textunderscore filtered} is acquired. Therefore, only \emph{filter\textunderscore f} is present in the following code snippets. Figure \ref{fig:tree-ilpf} displays the filter in use. 
-
-\begin{figure}[htpb]
-	\centering
-	\begin{tabular}{c}
-	\begin{lstlisting}[language=Python]
-import numpy as np		
-img = read_image(...)
-u = np.fft.fftfreq(img.shape[1])
-v = np.fft.fftfreq(img.shape[0])
-vv, uu = np.meshgrid(v, u, indexing='ij')
-D_0 = 0.05
-filter_f = (np.hypot(vv, uu) < D_0)
-img_f = np.fft.fft2(img)
-img_filtered = np.fft.ifft2(img_ft*filter_f).real
-	\end{lstlisting}
-	\end{tabular}
-	\caption[Example listing]{Implementation and application of Equation \ref{eq:ilpf}}\label{code:ilpf}
-\end{figure}
+where $D(u,v)$ is the distance from the center of the frequency domain and $D_{0}$ is a positive constant. The details of implementation is shown on Figure \ref{code:ilpf}.x` Figure \ref{fig:tree-ilpf} displays the filter in use. 
 
 \begin{figure}[htpb]
   \centering
@@ -629,17 +597,6 @@ As a reminder, filtering in the spatial domain is accomplished by convolving the
 where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. The details of implementation are shown on Figure \ref{code:glpf}. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artifact is eliminated while the blurring is accomplished successfully. 
 
 \begin{figure}[htpb]
-	\centering
-	\begin{tabular}{c}
-	\begin{lstlisting}[language=Python]
-sigma = 1/10
-filter_f = np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
-	\end{lstlisting}
-	\end{tabular}
-	\caption[Example listing]{Implementation of Equation \ref{eq:glpf}}\label{code:glpf}
-\end{figure}
-
-\begin{figure}[htpb]
   \centering
   \includegraphics[width=0.9\textwidth]{figures/intro/tree-glpf.png}
   \caption{
@@ -657,15 +614,6 @@ Next, high-pass filtering is discussed. In order to create a high-pass filter, t
 	\label{eq:ghpf}
 \end{equation}
 
-\begin{figure}[htpb]
-	\centering
-	\begin{tabular}{c}
-	\begin{lstlisting}[language=Python]
-sigma = 1/10
-filter_f = 1 - np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
-	\end{lstlisting}
-	\end{tabular}
-	\caption[Example listing]{Implementation of Equation \ref{eq:ghpf}}\label{code:ghpf}
-\end{figure}
+
 
 

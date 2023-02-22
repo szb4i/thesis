@@ -1,9 +1,83 @@
 \chapter{Python Dependencies}
 \label{appendix:a}
 
+This appendix contains a list of all Python libraries used in the thesis.
+
 \begin{itemize}
     \item Python \cite{rossum2009python}
     \item Matplotlib \cite{hunter2007matplotlib}: generating plots
     \item Numpy \cite{harris2020array}: storing array data structures, several data manipulation methods
     \item SciPy \cite{2020SciPy-NMeth}: convolving images with kernels
 \end{itemize}
+
+\chapter{Code Snippets}
+\label{appendix:b}
+
+\captionsetup{justification   = raggedright,
+              singlelinecheck = false}
+
+This appendix contains code snippets used in this thesis.
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+img_ft = np.fft.fft2(img)
+img_ft_abs = np.log(np.abs(img_ft))
+img_ft_abs_shifted = np.fft.fftshift(img_ft_abs)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Visualization of the Fourier transform. Variable \emph{img\textunderscore ft} is the discrete Fourier transform of the image. In the next line, the absolute value of the image is taken as the result of the Fourier transform outputs complex values. Furthermore, logarithm function needs to be applied in order to see any information on the output. Otherwise, the output is completely dark. This stage is variable \emph{img\textunderscore ft\textunderscore abs}. The default location of the zero frequency is in the upper left corner of the image rather than its center. This is not a mistake, it is how numpy handles the ordering of frequencies. Shifting has to be called explicitly if wanted.}\label{code:fft-shift}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+u = np.fft.fftfreq(img.shape[1])
+v = np.fft.fftfreq(img.shape[0])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+D_0 = 0.05
+filter_f = (np.hypot(vv, uu) < D_0)
+img_f = np.fft.fft2(img)
+img_filtered = np.fft.ifft2(img_ft*filter_f).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation and application of \gls{ilpf} (Equation \ref{eq:ilpf}). First, a coordinate system is generated with the discrete Fourier transform sample frequencies $u$ and $v$ matching the shape of the input image. Then, the function $np.meshgrid$ creates coordinate arrays for the $v$ and the $u$ coordinates and saves them into variable $vv$ and $uu$. Finally, \gls{ilpf} is calculated in frequency domain and stored in variable \emph{filter\textunderscore f}.}\label{code:ilpf}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+sigma = 1/10
+filter_f = np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
+img_f = np.fft.fft2(img)
+img_filtered = np.fft.ifft2(img_f*filter_f).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of \gls{glpf} (Equation \ref{eq:glpf})}\label{code:glpf}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+sigma = 1/10
+filter_f = 1 - np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
+img_f = np.fft.fft2(img)
+img_filtered = np.fft.ifft2(img_f*filter_f).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of \gls{ghpf} (Equation \ref{eq:ghpf})}\label{code:ghpf}
+\end{figure}
