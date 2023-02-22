@@ -21,6 +21,168 @@ This appendix contains code snippets used in this thesis.
 \begin{figure}[htpb]
 	\begin{tabular}{c}
 	\begin{lstlisting}[language=Python]
+img = read_image(...)
+gamma = ...
+img_transformed = img**0.2
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Power law transformation}
+\label{code:power-law}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import cv2
+import numpy as np
+img = cv2.imread(...)
+hist,bins = np.histogram(img.flatten(),256,[0,256])
+cdf = hist.cumsum()
+cdf_normalized = cdf * hist.max()/ cdf.max()
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Histogram of an image}
+\label{code:histogram}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+cdf_m = np.ma.masked_equal(cdf,0)
+cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
+cdf = np.ma.filled(cdf_m,0).astype('uint8')
+img2 = cdf[img]
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Equalizing histogram. Continuation of \ref{code:histogram}}	\label{code:histogram-equalized}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+import cv2
+img = cv2.imread(...)
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+cl1 = clahe.apply(img)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{CLAHE}
+\label{code:clahe}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+def get_gaussian_kernel(l=3, sig=1., normalize=True):
+    ax = np.linspace(-(l - 1) / 2., (l - 1) / 2., l)
+    gauss = np.exp(-0.5 * np.square(ax) / np.square(sig))
+    kernel = np.outer(gauss, gauss)
+    if normalize:
+        return kernel / np.sum(kernel)
+    return kernel
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Definition of \emph{get\textunderscore gaussian\textunderscore kernel}}
+\label{code:get-gaussian-kernel}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+from scipy.signal import convolve2d
+from utils.kernels.gaussian_kernel import get_gaussian_kernel
+img = read_image(...)
+kernel = get_gaussian_kernel(sig=5)
+img_filtered_1 = convolve2d(img, kernel, mode='same')
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Convolution with low-pass Gaussian kernel. \emph{get\textunderscore gaussian\textunderscore kernel} can be found in Code Snippet \ref{code:get-gaussian-kernel}}
+\label{code:gaussian-low-pass}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np	
+def get_sobel_x_kernel():
+  return np.array([[-1,0,1],[-2,0,2],[-1,0,1]], dtype=np.float)
+def get_sobel_y_kernel():
+  return np.array([[-1,-2,-1],[0,0,0],[1,2,1]], dtype=np.float)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Definitions for Sobel kernels}
+\label{code:sobel-kernels}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.signal import convolve2d
+from utils.kernels.sobel_kernels import get_sobel_x_kernel, get_sobel_y_kernel
+img = read_image(...)
+kernel_x = get_sobel_x_kernel()
+kernel_y = get_sobel_y_kernel()
+gx = convolve2d(img, kernel_x, mode='same', boundary = 'symm', fillvalue=0)
+gy = convolve2d(img, kernel_y, mode='same', boundary = 'symm', fillvalue=0)
+magnitude = np.hypot(gx, gy)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Sobel magnitude image. \emph{get\textunderscore sobel\textunderscore x\textunderscore kernel} and \emph{get\textunderscore sobel\textunderscore y\textunderscore kernel} can be found in Code Snippet \ref{code:sobel-kernels}}
+\label{code:sobel-magnitude}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+def get_laplacian_kernel():
+  return np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]], dtype=float)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Laplacian kernel}
+\label{code:laplacian-kernel}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+from scipy.signal import convolve2d
+from utils.kernels.laplacian_kernel import get_laplacian_kernel
+img = read_image(...)
+kernel = get_laplacian_kernel()
+img_laplacian = convolve2d(img, kernel, mode='same', boundary = 'symm', fillvalue=0)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Convolution with Laplacian}
+\label{code:laplacian-filtered}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+img = read_image(...)
+C = 9*np.identity(9)+np.full((9,9), -1)
+normalizing_const = 1/(9**2)
+kernel_dx = 1
+kernel_dy = 1
+img_wl = np.zeros((img.shape[0], img.shape[1]))
+for x in range(kernel_dy, img.shape[1] - kernel_dy):
+	for y in range(kernel_dx, img.shape[0] - kernel_dx):
+		region_flatten = img[x - kernel_dx: x + kernel_dx + 1, y - kernel_dy: y + kernel_dy + 1].flatten()
+		img_wl[x,y] = normalizing_const*(region_flatten.dot(C.dot(region_flatten)))
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{WL operator}
+\label{code:wl}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
 import numpy as np		
 img = read_image(...)
 img_ft = np.fft.fft2(img)
@@ -28,7 +190,8 @@ img_ft_abs = np.log(np.abs(img_ft))
 img_ft_abs_shifted = np.fft.fftshift(img_ft_abs)
 	\end{lstlisting}
 	\end{tabular}
-	\caption[Example listing]{Visualization of the Fourier transform. Variable \emph{img\textunderscore ft} is the discrete Fourier transform of the image. In the next line, the absolute value of the image is taken as the result of the Fourier transform outputs complex values. Furthermore, logarithm function needs to be applied in order to see any information on the output. Otherwise, the output is completely dark. This stage is variable \emph{img\textunderscore ft\textunderscore abs}. The default location of the zero frequency is in the upper left corner of the image rather than its center. This is not a mistake, it is how numpy handles the ordering of frequencies. Shifting has to be called explicitly if wanted.}\label{code:fft-shift}
+	\caption[Example listing]{Visualization of the Fourier transform. Variable \emph{img\textunderscore ft} is the discrete Fourier transform of the image. In the next line, the absolute value of the image is taken as the result of the Fourier transform outputs complex values. Furthermore, logarithm function needs to be applied in order to see any information on the output. Otherwise, the output is completely dark. This stage is variable \emph{img\textunderscore ft\textunderscore abs}. The default location of the zero frequency is in the upper left corner of the image rather than its center. This is not a mistake, it is how numpy handles the ordering of frequencies. Shifting has to be called explicitly if wanted.}
+\label{code:fft-shift}
 \end{figure}
 
 \begin{figure}[htpb]
@@ -45,7 +208,8 @@ img_f = np.fft.fft2(img)
 img_filtered = np.fft.ifft2(img_ft*filter_f).real
 	\end{lstlisting}
 	\end{tabular}
-	\caption[Example listing]{Implementation and application of \gls{ilpf} (Equation \ref{eq:ilpf}). First, a coordinate system is generated with the discrete Fourier transform sample frequencies $u$ and $v$ matching the shape of the input image. Then, the function $np.meshgrid$ creates coordinate arrays for the $v$ and the $u$ coordinates and saves them into variable $vv$ and $uu$. Finally, \gls{ilpf} is calculated in frequency domain and stored in variable \emph{filter\textunderscore f}.}\label{code:ilpf}
+	\caption[Example listing]{Implementation and application of \gls{ilpf} (Equation \ref{eq:ilpf}). First, a coordinate system is generated with the discrete Fourier transform sample frequencies $u$ and $v$ matching the shape of the input image. Then, the function $np.meshgrid$ creates coordinate arrays for the $v$ and the $u$ coordinates and saves them into variable $vv$ and $uu$. Finally, \gls{ilpf} is calculated in frequency domain and stored in variable \emph{filter\textunderscore f}.}
+\label{code:ilpf}
 \end{figure}
 
 \begin{figure}[htpb]
@@ -62,7 +226,8 @@ img_f = np.fft.fft2(img)
 img_filtered = np.fft.ifft2(img_f*filter_f).real
 	\end{lstlisting}
 	\end{tabular}
-	\caption[Example listing]{Implementation of \gls{glpf} (Equation \ref{eq:glpf})}\label{code:glpf}
+	\caption[Example listing]{Implementation of \gls{glpf} (Equation \ref{eq:glpf})}
+\label{code:glpf}
 \end{figure}
 
 \begin{figure}[htpb]
@@ -79,5 +244,6 @@ img_f = np.fft.fft2(img)
 img_filtered = np.fft.ifft2(img_f*filter_f).real
 	\end{lstlisting}
 	\end{tabular}
-	\caption[Example listing]{Implementation of \gls{ghpf} (Equation \ref{eq:ghpf})}\label{code:ghpf}
+	\caption[Example listing]{Implementation of \gls{ghpf} (Equation \ref{eq:ghpf})}
+\label{code:ghpf}
 \end{figure}

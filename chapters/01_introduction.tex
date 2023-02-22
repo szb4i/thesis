@@ -125,7 +125,7 @@ where $\gamma$ is a positive constant which can be tuned for the desired needs a
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/power-law.png}
-  \caption{Power law transformations with various $\gamma$ values \cite{tree-img}}
+  \caption{Power law transformations with various $\gamma$ values (Code Snippet \ref{code:power-law}) \cite{tree-img}}
   \label{fig:/power-law}
 \end{figure}
 
@@ -135,7 +135,7 @@ Another effective way to enhance the global contrast of images is applying histo
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/unequalized_hist.png}
-  \caption{Original image and its histogram \cite{capper2006unequalized} \cite{bradski2000opencv} }
+  \caption{Original image and its histogram (Code Snippet \ref{code:histogram}) \cite{capper2006unequalized} \cite{bradski2000opencv} }
   \label{fig:/unequalized_hist}
 \end{figure}
 
@@ -162,7 +162,7 @@ The suggested approach is called \gls{clahe} (Contrast Limited Adaptive Histogra
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/intro/clahe.png}
-  \caption{\gls{clahe} with clipLimit=2.0 and tileGridSize=(8,8)  \cite{bradski2000opencv}}
+  \caption{\gls{clahe} with clipLimit=2.0 and tileGridSize=(8,8) (Code Snippet \ref{code:clahe}) \cite{bradski2000opencv}}
   \label{fig:/intro-clahe}
 \end{figure}
 
@@ -222,7 +222,7 @@ Figure \ref{fig:/lowpass-gaussian-example} shows the effects of convolving an im
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/lowpass-gaussian-example.png}
-  \caption{Image convolved with lowpass gaussian kernels \cite{tree-img}}
+  \caption{Image convolved with lowpass gaussian kernels (Code Snippet \ref{code:gaussian-low-pass}) \cite{tree-img}}
   \label{fig:/lowpass-gaussian-example}
 \end{figure}
 
@@ -305,7 +305,7 @@ Each steps of this process can been seen on Figure \ref{fig:sobel-tree}. It is c
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/sobel-tree.png}
-  \caption{Using Sobel kernels \cite{tree-img}}
+  \caption{Using Sobel kernels (Code Snippet \ref{code:sobel-magnitude}) \cite{tree-img}}
   \label{fig:sobel-tree}
 \end{figure}
 
@@ -337,7 +337,7 @@ where the sign of $c$ depends on the implementation of the Laplacian kernel. If 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=1\textwidth]{figures/intro/laplacian-tree.png}
-  \caption{Convolving with Laplacian kernel. $c$ was set to 0.5 \cite{tree-img}}
+  \caption{Convolving with Laplacian kernel. $c$ was set to 0.5 (Code Snippet \ref{code:laplacian-filtered}) \cite{tree-img}}
   \label{fig:laplacian-tree}
 \end{figure}
 
@@ -409,7 +409,7 @@ Consider a noisy image as in case of Figure \ref{fig:sobel-vs-wl-noisy}. Compare
   \includegraphics[width=0.6\textwidth]{figures/intro/sobel-vs-wl.png}
   \caption{Left: 
   Sobel image (calculation based on Equation \ref{eq:sobel-magnitued}).\\\hspace{\textwidth}
-  Right: WL image (calculation based on Equation \ref{eq:local-variance-vectorized})  \cite{tree-img}}
+  Right: WL image (calculation based on Equation \ref{eq:local-variance-vectorized}, Code Snippet \ref{code:wl})  \cite{tree-img}}
   \label{fig:sobel-vs-wl}
 \end{figure}
 
