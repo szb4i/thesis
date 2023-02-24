@@ -594,7 +594,7 @@ As a reminder, filtering in the spatial domain is accomplished by convolving the
 	\label{eq:glpf}
 \end{equation}
 
-where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. The details of implementation are shown on Figure \ref{code:glpf}. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artifact is eliminated while the blurring is accomplished successfully. 
+where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artifact is eliminated while the blurring is accomplished successfully. 
 
 \begin{figure}[htpb]
   \centering
@@ -602,18 +602,77 @@ where $D(u,v)$ is the distance from the center of the frequency domain and $\sig
   \caption{
 	Left: Original image \cite{tree-img} \\\hspace{\textwidth}
 	Center: \gls{glpf} filter in frequency domain  \\\hspace{\textwidth}
-	Right: Filtered image
+	Right: Filtered image (Code Snippet \ref{code:glpf})
    }
   \label{fig:tree-glpf}
 \end{figure}
 
-Next, high-pass filtering is discussed. In order to create a high-pass filter, the previously introduced \gls{glpf} can be reused. The Gaussian high-pass filter (\gls{ghpf}) can be expressed as it is shown in Equation \ref{eq:ghpf} and the details of implementation can be seen on Figure \ref{code:ghpf}.
+Next, high-pass filtering is discussed. In order to create a high-pass filter, the previously introduced \gls{glpf} can be reused. The Gaussian high-pass filter (\gls{ghpf}) can be expressed as follows:
 
 \begin{equation}
 	H(u, v)= 1- e^{-D^{2}(u,v)/2\sigma ^{2}}
 	\label{eq:ghpf}
 \end{equation}
 
+The filtered image is displayed on the 3rd image of Figure \ref{fig:tree-ghpf}. It can be noticed that in the background of the filtered image the smooth intensity variations in the clouds are ignored and only the sharp changes are highlighted near the field and the tree. On the other hand, because the DC term (the center of the frequency domain) is filtered out, the average intensity of the image is decreased. If the DC term is required, the computation of the inverse Fourier transform can be modified as follows:
 
+\begin{equation}
+	g(x,y)=\mathcal{F}^{-1}\{(1+H_{hp})F(u,v)\}
+	\label{eq:ghpf-plus-dc}
+\end{equation}
 
+where $H_{hp}$ is $H$ from Equation \ref{eq:ghpf}. The result is shown on the 4th image of Figure \ref{fig:tree-ghpf}.
 
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=1\textwidth]{figures/intro/tree-ghpf.png}
+  \caption{
+	1st: Original image \cite{tree-img} \\\hspace{\textwidth}
+	2nd: \gls{ghpf} filter in frequency domain \\\hspace{\textwidth}
+	3rd: Filtered with \gls{ghpf} (Code Snippet \ref{code:ghpf}) \\\hspace{\textwidth}
+	4th: Filtered with \gls{ghpf}. Leaving DC term (Code Snippet \ref{code:ghpf-plus-dc})
+   }
+  \label{fig:tree-ghpf}
+\end{figure}
+
+Knowing \gls{glpf} and \gls{ghpf}, one can try creating a band-pass filter. Consider two Gaussians with different $\sigma$ values. The difference of the two leaves passage only for a narrow band in the frequency domain. It can be expressed as:
+
+\begin{equation}
+	H(u,v)=e^{-D^{2}(u,v)/2\sigma_{2}^{2}}-e^{-D^{2}(u,v)/2\sigma_{1}^{2}}
+	\label{eq:gauss-diff}
+\end{equation}
+
+where $\sigma_{2} > \sigma_{1}$. Figure \ref{fig:tree-bandpass-gauss-diff} shows the filter in use. The application of a band-pass filter can be effective when highlighting structure with a specific width is required - e.g. víessel structure. Furthermore, it suppresses high frequency noise.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/tree-bandpass-gauss-diff.png}
+  \caption{
+	Left: Original image \cite{tree-img} \\\hspace{\textwidth}
+	Center: Band-pass filter (Equation \ref{eq:gauss-diff}) in frequency domain  \\\hspace{\textwidth}
+	Right: Filtered image (Code Snippet \ref{code:gauss-diff})
+   }
+  \label{fig:tree-bandpass-gauss-diff}
+\end{figure}
+
+Switching to an alternative Gaussian could be a viable solution if thinner band filtering is desired.
+
+\begin{equation}
+	H(u,v)=1-e^{-\frac{(D(u,v)-C_{0})^{2}}{W^{2}}}
+	\label{eq:gauss-alternative}
+\end{equation}
+
+where $C_{0}$ is the center of the band and $W$ is the width of the band. Application is show on Figure \ref{fig:tree-bandpass-gauss-alternative}. Comparing the middle images of Figure \ref{fig:tree-bandpass-gauss-alternative} and \ref{fig:tree-bandpass-gauss-diff}, it can be noticed that the prior provides a thinner band. However, by widening $W$, the earlier shown ringing artifact (see Figure \ref{fig:tree-ilpf}) is starting to appeal.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/intro/tree-bandpass-gauss-alternative.png}
+  \caption{
+	Left: Original image \cite{tree-img} \\\hspace{\textwidth}
+	Center: Band-pass filter (Equation \ref{eq:gauss-alternative}) in frequency domain  \\\hspace{\textwidth}
+	Right: Filtered image (Code Snippet \ref{code:bandpass-gauss-alternative})
+   }
+  \label{fig:tree-bandpass-gauss-alternative}
+\end{figure}
+
+As it has been demonstrated in this chapter, frequency domain filtering is a crucial technique along with spatial domain filtering. When one needs to highlight visual elements with particular frequencies, frequency domain filtering is a more obvious choice. In case of large images, filtering in frequency domain performs computationally far more effectively than sliding across the entire image in spatial domain. There are other filtering perspectives that do not fit into either of the previous chapters. Next, these techniques are introduced.

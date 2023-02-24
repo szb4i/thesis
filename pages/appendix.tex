@@ -153,7 +153,9 @@ from scipy.signal import convolve2d
 from utils.kernels.laplacian_kernel import get_laplacian_kernel
 img = read_image(...)
 kernel = get_laplacian_kernel()
-img_laplacian = convolve2d(img, kernel, mode='same', boundary = 'symm', fillvalue=0)
+img_laplacian = convolve2d(
+	img, kernel, mode='same', boundary = 'symm', fillvalue=0
+)
 	\end{lstlisting}
 	\end{tabular}
 	\caption[Example listing]{Convolution with Laplacian}
@@ -172,8 +174,13 @@ kernel_dy = 1
 img_wl = np.zeros((img.shape[0], img.shape[1]))
 for x in range(kernel_dy, img.shape[1] - kernel_dy):
 	for y in range(kernel_dx, img.shape[0] - kernel_dx):
-		region_flatten = img[x - kernel_dx: x + kernel_dx + 1, y - kernel_dy: y + kernel_dy + 1].flatten()
-		img_wl[x,y] = normalizing_const*(region_flatten.dot(C.dot(region_flatten)))
+		region_flatten = img[
+			x - kernel_dx: x + kernel_dx + 1,
+			y - kernel_dy: y + kernel_dy + 1
+		].flatten()
+		img_wl[x,y] = normalizing_const*(
+			region_flatten.dot(C.dot(region_flatten))
+		)
 	\end{lstlisting}
 	\end{tabular}
 	\caption[Example listing]{WL operator}
@@ -246,4 +253,61 @@ img_filtered = np.fft.ifft2(img_f*filter_f).real
 	\end{tabular}
 	\caption[Example listing]{Implementation of \gls{ghpf} (Equation \ref{eq:ghpf})}
 \label{code:ghpf}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img = read_image(...)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+sigma = 1/10
+filter_f = 1 - np.exp(-np.hypot(uu, vv)**2/(2*sigma**2))
+img_f = np.fft.fft2(img)
+k = 1
+img_filtered = np.fft.ifft2(img_f*(k+filter_f)).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of \gls{ghpf} with DC term (Equation \ref{eq:ghpf-plus-dc}). By changing $k$ (last two lines), one can control the contribution of the DC term}
+\label{code:ghpf-plus-dc}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img_f = np.fft.fft2(img)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+sigma_1 = 0.15
+gauss_1 = np.exp(-(np.hypot(uu, vv))**2/(2*sigma_1**2))
+sigma_2 = 0.16
+gauss_2 = np.exp(-(np.hypot(uu, vv))**2/(2*sigma_2**2))
+gauss_diff = gauss_2 - gauss_1
+img_filtered = np.fft.ifft2(img_f * gauss_diff).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of a band-pass filter (Equation \ref{eq:gauss-diff})}
+\label{code:gauss-diff}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np		
+img_f = np.fft.fft2(img)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+C0 = 0.25
+W = 0.1
+filter_f = np.exp(-(np.hypot(uu, vv) - C0)**2/(W**2))
+img_filtered = np.fft.ifft2(img_f * filter_f).real
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{Implementation of a band-pass filter (Equation \ref{eq:gauss-alternative}). $C_{0}$ is the center of the band and $W$ is the width of the band}
+\label{code:bandpass-gauss-alternative}
 \end{figure}
