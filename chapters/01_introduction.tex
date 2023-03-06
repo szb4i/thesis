@@ -5,7 +5,7 @@
 In this chapter, the theoretical background of the thesis is written. First, the basics of X-ray radiography is introduced, then Digital Subtraction Angiography (\gls{dsa}) is described briefly and it is shown how Digital Variance Angiography (\gls{dva}) differs from the prior approach. Next, it is shown how intensity transformations can be utilized to enhance crucial image features. Later, spatial and frequency domain filtering techniques are presented. In the end of the chapter, further methods are discussed which do not fall into the previously mentioned categories.
 
 \section{X-ray Radiography}
-X-ray radiography is a powerful tool used in medical imaging. It is a non-invasive imaging technique that uses a beam of X-rays to create an images of the inside of the body relatively fast. X-ray is a form of electromagnetic radiation which has a wavelength ranging from about $10^{-8}\:m$ to $ 10^{-12}\:m$ (from $3\:\cdot\:10^{16}\:Hz$ to $3\:\cdot\:10^{19}\:Hz$) and energy between 20 - 120 $keV$ \cite{rontgen1896new}. 
+X-ray radiography is a powerful tool used in medical imaging. It is a non-invasive imaging technique that uses a beam of X-rays to create images of the inside of the body relatively fast. X-ray is a form of electromagnetic radiation which has a wavelength ranging from about $10^{-8}\:m$ to $ 10^{-12}\:m$ (from $3\:\cdot\:10^{16}\:Hz$ to $3\:\cdot\:10^{19}\:Hz$) and energy between 20 - 120 $keV$ \cite{rontgen1896new}. 
 
 There are several interactions possible when X-rays interact with matter \cite{seibert2005x}. Here we only discuss the effects of photoelectric absorption and Compton scattering to beam attenuation as these are the most dominant factors in the energy range of medical imaging (Figure \ref{fig:cross-section}).
 
@@ -26,20 +26,20 @@ Assuming an inhomogeneous sample and a monoenergetic beam, Lambert-Beer's law ca
 \end{equation}
 
 
-\emph{p(d)} is called the line integral. \emph{I(d)} is the intensity in distance \emph{d} behind the initial intensity \emph{I(0)}. \emph{\textmu (s)} is the mass attenuation coefficient, which is composed by cross sections of different interactions. In X-ray radiography, the beam is leaving the X-ray tube with the initial intensity \emph{I(0)}, then interacts with tissues of various mass attenuation coefficients (\emph{\textmu (s)}).  As it reaches the detector, the initial intensity is reduced to \emph{I(d)}.
+\emph{p(d)} is called the line integral. \emph{I(d)} is the intensity in distance \emph{d} behind the initial intensity \emph{I(0)}. \emph{\textmu (s)} is the linear attenuation coefficient, which is composed by cross sections of different interactions. In X-ray radiography, the beam is leaving the X-ray tube with the initial intensity \emph{I(0)}, then interacts with tissues of various mass attenuation coefficients (\emph{\textmu (s)}).  As it reaches the detector, the initial intensity is reduced to \emph{I(d)}.
 
-Based on equation \ref{eq:line-integral}, it can be explained that materials with higher \emph{\textmu} values are more visible on X-ray images. In the human body, these materials with high \emph{\textmu} are mostly bones. Figure \ref{fig:attenuation-for-bone-and-tissue} compares \emph{\textmu} of bones and soft tissue. In the diagnostic energy range, bone contributes the most significantly to the total attenuation, therefore it is the most visible tissue on the final image.
+Based on equation \ref{eq:line-integral}, it can be explained that materials with higher \emph{\textmu} values are more visible on X-ray images. In the human body, these materials with high \emph{\textmu} are mostly bones. Figure \ref{fig:attenuation-for-bone-and-tissue} compares the attenuation of bones and soft tissue. In the diagnostic energy range, bone contributes the most significantly to the total attenuation, therefore it is the most visible tissue on the final image.
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.5\textwidth]{figures/intro/attenuation-for-bone-and-tissue.png}
-  \caption{The mass attenuation coefficient as a function of photon energy for bone and soft tissue within the diagnostic energy ranges (30–150 $keV$) \cite{kim2013optimal}} \label{fig:attenuation-for-bone-and-tissue}
+  \caption{The mass attenuation coefficient ($\mu_{m}=\mu / \rho_{m}$ where $\rho_{m}$ is the mass density) as a function of photon energy for bone and soft tissue within the diagnostic energy ranges (30–150 $keV$) \cite{kim2013optimal}} \label{fig:attenuation-for-bone-and-tissue}
 \end{figure}
 
 As a conclusion, visualizing vessel structure is not possible using traditional X-ray radiography. To solve this issue, angiography has been evolved.
 
 \section{Angiography}
-In Angiography, a contrast agent is injected into the blood vessel. On of the most popular types of these contrast agents are iodine-based contrast media. As Figure \ref{fig:attenuation-for-several-materials} shows, the mass attenuation coefficient of iodine is relatively high compared to the tissues in the human body. Utilizing this attribute of iodine, visualization of vessels is possible for that short time when the contrast agent expands in the human body right after injection.
+In Angiography, a contrast agent is injected into the blood vessel. The most popular types of these contrast agents are iodine-based contrast media. As Figure \ref{fig:attenuation-for-several-materials} shows, the mass attenuation coefficient of iodine is relatively high compared to the tissues in the human body. Utilizing this attribute of iodine, visualization of vessels is possible for that short time when the contrast agent expands in the human body right after injection.
 
 \begin{figure}[htpb]
   \centering
@@ -662,7 +662,7 @@ Switching to an alternative Gaussian could be a viable solution if thinner band 
 	\label{eq:gauss-alternative}
 \end{equation}
 
-where $C_{0}$ is the center of the band and $W$ is the width of the band. Application is show on Figure \ref{fig:tree-bandpass-gauss-alternative}. Comparing the middle images of Figure \ref{fig:tree-bandpass-gauss-alternative} and \ref{fig:tree-bandpass-gauss-diff}, it can be noticed that the prior provides a thinner band. However, by widening $W$, the earlier shown ringing artifact (see Figure \ref{fig:tree-ilpf}) is starting to appeal.
+where $C_{0}$ is the center of the band and $W$ is the width of the band. Application is shown on Figure \ref{fig:tree-bandpass-gauss-alternative}. Comparing the middle images of Figure \ref{fig:tree-bandpass-gauss-alternative} and \ref{fig:tree-bandpass-gauss-diff}, it can be noticed that the prior provides a thinner band. However, by widening $W$, the earlier shown ringing artifact (see Figure \ref{fig:tree-ilpf}) is starting to appeal.
 
 \begin{figure}[htpb]
   \centering
