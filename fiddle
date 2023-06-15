@@ -1,0 +1,184 @@
+HTML CSS JS Result Skip Results Iframe
+let discipline = [
+  {
+    name: "Rugby sevens",
+    data: "rugby sevens"
+  }
+];
+
+Highcharts.getJSON(
+  "https://raw.githubusercontent.com/mekhatria/demo_highcharts/master/olympic2012.json?callback=?",
+  function (data) {
+    
+    function regression(arrWeight, arrHeight) {
+      let r, sy, sx, b, a, meanX, meanY;
+      r = jStat.corrcoeff(arrHeight, arrWeight);
+      sy = jStat.stdev(arrWeight);
+      sx = jStat.stdev(arrHeight);
+      meanY = jStat(arrWeight).mean();
+      meanX = jStat(arrHeight).mean();
+      b = r * (sy / sx);
+      a = meanY - meanX * b;
+      //Set up a line
+      let y1, y2, x1, x2;
+      x1 = jStat.min(arrHeight);
+      x2 = jStat.max(arrHeight);
+      y1 = a + b * x1;
+      y2 = a + b * x2;
+      return {
+        line: [
+          [x1, y1],
+          [x2, y2]
+        ],
+        r
+      };
+    }
+    
+    const getData = (continentName) => {
+      let temp = [],
+        tempWeight = [],
+        tempHeight = [];
+      data.forEach((elm) => {
+        if (
+          elm.continent == continentName &&
+          elm.weight > 0 &&
+          elm.height > 0
+        ) {
+          temp.push([elm.height, elm.weight]);
+          tempWeight.push(elm.weight);
+          tempHeight.push(elm.height);
+        }
+      });
+      let { line, r } = regression(tempWeight, tempHeight);
+      return [temp, line, r];
+    };
+
+    const getDataSport = (sportName) => {
+      let temp = [],
+        tempWeight = [],
+        tempHeight = [];
+
+      data.forEach((elm) => {
+        if (elm.sport == sportName && elm.weight > 0 && elm.height > 0) {
+          temp.push([elm.height, elm.weight]);
+          tempWeight.push(elm.weight);
+          tempHeight.push(elm.height);
+        }
+      });
+      let { line, r } = regression(tempWeight, tempHeight);
+      return [temp, line, r];
+    };
+    
+    let series = [],
+      visible = false,
+      index = 0,
+      activate = ["Rugby sevens"];
+    discipline.forEach((e) => {
+      if (activate.indexOf(e.name) > -1) {
+        visible = true;
+      } else {
+        visible = false;
+      }
+      let [scatterData, line, r] = getDataSport(e.data);
+      series.push(
+        {
+          type: "scatter",
+          visible: visible,
+          name:"Height/weight",
+          data: scatterData
+        },
+        {
+          name: e.name,
+          visible: visible,
+          name:"Linear regression",
+          r: r,
+          data: line,
+          color:"#ec7c7d"
+        }
+      );
+    });
+
+    Highcharts.chart("container", {
+      
+      chart: {
+        type: "line",
+        zoomType: "y"
+      },
+
+      title: {
+        text: "2012 Olympic rugby sevens athletes' weight and height relationship"
+      },
+      
+      xAxis: {
+        title: {
+          text: "Height"
+        },
+        labels: {
+          format: "{value} m"
+        },
+        min: 1.25
+      },
+      
+      yAxis: {
+        title: {
+          text: "Weight"
+        },
+        labels: {
+          format: "{value} kg"
+        }
+      },
+      
+      legend: {
+        enabled: true
+      },
+      
+      plotOptions: {
+        scatter: {
+          marker: {
+            radius: 2.5,
+            symbol: "circle",
+            states: {
+              hover: {
+                enabled: true,
+                lineColor: "rgb(100,100,100)"
+              }
+            }
+          },
+          states: {
+            hover: {
+              marker: {
+                enabled: false
+              }
+            }
+          }
+        },
+        line: {
+          lineWidth: 2.5
+        }
+      },
+
+      tooltip: {
+        formatter: function () {
+          if (this.series.data.length > 2) {
+            return (
+              this.series.name +
+              "<br/>Height: " +
+              this.x +
+              " m<br/>Weight: " +
+              this.y +
+              " kg"
+            );
+          } else {
+            return (
+              this.series.name +
+              "<br/>r: " +
+              this.series.userOptions.r.toFixed(2)
+            );
+          }
+        }
+      },
+      
+      series: series
+    });
+  }
+);
