@@ -676,3 +676,82 @@ where $C_{0}$ is the center of the band and $W$ is the width of the band. Applic
 \end{figure}
 
 As it has been demonstrated in this chapter, frequency domain filtering is a crucial technique along with spatial domain filtering. When one needs to highlight visual elements with particular frequencies, frequency domain filtering is a more obvious choice. In case of large images, filtering in frequency domain performs computationally far more effectively than sliding across the entire image in spatial domain. There are other filtering perspectives that do not fit into either of the previous chapters. Next, these techniques are introduced.
+
+
+\subsection{Enhancement with Principal Component Analysis}
+
+Principal Component Analysis (\gls{pca}) is regarded by many as a highly prevalent dimension reduction technique. In order to raise comprehensibility of the method, it is practical to look into the process within a two-dimensional context \cite{gagneur2002data}.
+
+The goal is to merge the $x_1$ and $x_2$ attributes of different observations into a single score. From a geometric perspective, one has to identify a line that is positioned as closely as possible to the given data points. The closeness is determined by minimizing the sum of squared Euclidean distances.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/intro/pca2d.png}
+  \caption{
+		$x_1$ and $x_2$ attributes of different observations
+   }
+  \label{fig:pca-2d}
+\end{figure}
+
+In this analysis, it is assumed that all variables are centered, causing the line passing through the origin. Let $w$ be a unit direction vector denoting the line. The closest point on the line to the observation vector $x_i$ is its orthogonal projection $p(x_i)$ which is equal to the scalar product of the direction vector and the observation vector, times the direction vector:
+
+\begin{equation}
+	p(x_i)=(w^{T}x_i)w
+	\label{eq:orthogonal-projection}
+\end{equation}
+
+Hence, the optimal line that corresponds closest with all the given data points can be determined by solving the following equation:
+
+\begin{equation}
+	\begin{split}
+		\min_{w}\sum_{i=1}^{n}|x_{i}-(w^{T}x_{i})w|^{2} \\
+		(|w|=1)
+		\label{eq:minimize-w}
+	\end{split}
+\end{equation}
+
+This optimal direction vector $w$ is referred as the first principal component (\gls{pc1}) of the data.
+
+The task can also be perceived as a maximisation problem. In this case, it may be derived from Pythagoras' theorem that:
+
+\begin{equation}
+	|x_{i}|^{2}=|p(x_{i})|^{2}+|x_{i}-p(x_{i})|^{2}
+	\label{eq:max-w-pythagoras}
+\end{equation}
+
+Across the whole dataset, the sum of $|x_{i}|$ remains constant regardless of the specific selection of the directional vector $w$. Hence, the minimization issue represented by Equation \ref{eq:minimize-w} can be considered as identical to:
+
+
+\begin{equation}
+	\begin{split}
+		\max_{w}\sum_{i=1}^{n}|p(x_{i})|^{2} \\
+		(|w|=1)
+		\label{eq:max-w}
+	\end{split}	
+\end{equation}
+
+The data has been centered, resulting in the origin being represented by the mean of the dataset. Therefore, the sum of squared norms can be expressed as:
+
+\begin{equation}
+	\sum_{i=1}^{n}|p(x_{i})|^{2}=n\text{Var}(p(x))
+	\label{eq:pca-var}
+\end{equation}
+
+Thus, it may be claimed that \gls{pc1} is maximising the variance of the data.
+
+% In a multi dimensional scenario, involving $p$ variables and $n$ observations, the objective is to identify the $q$-dimensional plane that presents the closest proximity to the data, as measured by the sums of squared Euclidean distances (or according to Equation \ref{eq:pca-var},  the  plane that maximizes the variance of the projected data.).
+%Moreover, it can be shown that the principal components correspond to the eigenvectors of the covariance matrix of the data.
+
+In a multi-dimensional context, \gls{pca} can be used to transform the data into an alternative coordinate system. This transformation is designed to ensure that the highest variance, as determined by the orthogonal projection $p(x_i)$, is aligned with the first coordinate (identified as \gls{pc1}). Subsequently, the second highest variance is aligned with the second coordinate (identified as \gls{pc2}), and so forth.
+
+The current thesis does not contain additional implementation-specific details. Please refer to the Bishop's book \cite{bishop2006pattern}  for further clarification and supporting evidence.
+
+In the field of data analysis, \gls{pca} is a frequently used technique to reduce the dimensionality of the data.  This is achieved by projecting each data point onto a limited number of principle components, hence obtaining lower-dimensional data while retaining a significant portion of the variation of original data. The utilisation of dimensionality reduction in \gls{dva} will be covered in Chapter ??.
+
+
+
+
+
+
+
+
