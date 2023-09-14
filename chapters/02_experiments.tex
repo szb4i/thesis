@@ -10,24 +10,31 @@ In order to test the efficiency of the techniques, the present thesis uses the f
   \centering
   \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-clahe.png}
   \caption{
-	Sample \gls{dva} records with marked \gls{roi}s
+	Sample \gls{dva} records with marked \gls{roi}s\\\hspace{\textwidth}
+	Blue rectangles: \gls{roi} inside vein (signal)\\\hspace{\textwidth}
+	Red rectangles: \gls{roi} outside vein (noise)
    }
   \label{fig:prostate-carotis-clahe}
 \end{figure}
 
-The signal-to-noise ratio model used to perform quantitative analysis is as follows:
+The signal-to-noise ratio \gls{snr}  model used to perform quantitative analysis is as follows:
 \begin{equation}
-    SNR=\frac{\mu_{a} - \mu_{b}}{\sigma_{b}}
-    \label{eq:snr}
-\end{equation}
+    \text{SNR}_{i}=\frac{\mu_{a}^{(i)} - \mu_{b}^{(i)}}{\sigma_{b}^{(i)}}
+    \label{eq:snr-i}
+ \end{equation}
+ \begin{equation}
+    \text{SNR}=\frac{\sum_{i}^{n}A_{i}\text{SNR}_{i}}{A}
+    \label{eq:snr-agv}
+ \end{equation}
 
-where $\mu_{a}$ is the signal mean measured in region of interest (\gls{roi}) $a$, $\mu_{b}$ is the signal mean measured in \gls{roi} $b$ and $\sigma_{b}$ is the standard deviation of the noise measure in \gls{roi} $b$. \gls{roi} $a$ areas are regions inside veins (colour blue on Figure \ref{fig:prostate-carotis}) while \gls{roi} $b$ areas are regions outside veins (colour red on Figure \ref{fig:prostate-carotis}). In an optimal scenario, a ROI $a$ is anticipated to yield a maximum signal, whereas a ROI $b$ is expected to yield no signal.
 
-In addition to running SNR measurements, the evaluation of algorithm outcomes is performed by medical specialists too.
+where $\mu_{a}$ is the signal mean measured in region of interest (\gls{roi}) $a$, $\mu_{b}$ is the signal mean measured in \gls{roi} $b$ and $\sigma_{b}$ is the standard deviation of the noise measure in \gls{roi} $b$. \gls{roi} $a$ areas are regions inside veins (colour blue on Figure \ref{fig:prostate-carotis}) while \gls{roi} $b$ areas are regions outside veins (colour red on Figure \ref{fig:prostate-carotis}). \gls{snr} is calculated in $n$ different regions and their arithmetic mean is calculated to represent the effectiveness of an algorithm with simply one quantity.  The \gls{roi} is evaluated in $n$ distinct regions and the representative measure of efficiency is obtained by computing the weighted arithmetic mean of these values. The $A_{i}$ weighting factors used in this calculation correspond to the areas of the distinct \gls{roi}s. This approach allows for encapsulating the quality of the algorithm into a single quantity.
+
+According to the Rose criterion, it is necessary to have \gls{snr} of at least 5 in order to confidently differentiate visual details.  \gls{snr} below 5 indicates a level of certainty in recognising visual details that is below 100\% \cite{bushberg2011essential}. In addition to running SNR measurements, the evaluation of algorithm outcomes is performed by medical specialists too.
 
 \section{Contrast Limited Adaptive Histogram Equalisation (\gls{clahe})}
 
-As noted in Chapter \ref{subsection:intensity-transformations}, Contrast Limited Adaptive Histogram Equalisation (\gls{clahe}) is a highly effective technique due to its ability to do histogram equalisation on a local scale, namely on a tile-by-tile level. On Figure \ref{fig:prostate-carotis-clahe}, the \gls{clahe} enhanced image is displayed. In the absence of such enhancement, the \gls{dva} records would look as follows:
+As noted in Chapter \ref{subsection:intensity-transformations}, Contrast Limited Adaptive Histogram Equalisation (\gls{clahe}) is a highly effective technique due to its ability to do histogram equalisation on a local scale, namely on a tile-by-tile level. On Figure \ref{fig:prostate-carotis-clahe}, the \gls{clahe} enhanced image is displayed. In the absence of such enhancement, the \gls{dva} records would appear as seen on Figure \ref{fig:prostate-carotis}.
 
 \begin{figure}[htpb]
   \centering
@@ -37,6 +44,8 @@ As noted in Chapter \ref{subsection:intensity-transformations}, Contrast Limited
    }
   \label{fig:prostate-carotis}
 \end{figure}
+
+In Section \ref{subsection:intensity-transformations}, OpenCV's \gls{clahe} implementation was utilised for demonstration. Unfortunately, the functionality provided by OpenCV is limited to 8-bit pictures only, whereas the used \gls{dva} records are 64-bit images. Downgrading to 8-bit is not acceptable, thus demanding the use of a different library, namely scikit-image \cite{scikit-image}. As an example for \gls{clahe} in scikit-image, Code Snippet \ref{code:clahe-scikit} is presented.
 
 Following a series of intuitive experiments, the parameters were assigned the following values:
 \begin{itemize}
@@ -50,6 +59,15 @@ All of the following images in the thesis were post-processed with the \gls{clah
 
 \subsection{Sobel kernel}
 
-As noted earlier, Sobel kernels are discretized gradient kernels with dimensions of 3x3. Typically, in the use of this method, a magnitude image is computed using Equation \ref{eq:sobel-magnitued}. 
+As noted earlier, Sobel kernels are discretized gradient kernels with dimensions of 3x3. Typically, in the use of this method, a magnitude image is computed using Equation \ref{eq:sobel-magnitued}. By adopting this approach, the results on Figure \ref{fig:prostate-carotis-sobel-magnitude} can be achieved.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-sobel.png}
+  \caption{
+	Sobel magnitude images. $SNR=0.46$
+   }
+  \label{fig:prostate-carotis-sobel-magnitude}
+\end{figure}
 
 \section{Principal Component Analysis (\gls{pca})}\label{section:pca}

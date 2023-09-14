@@ -311,3 +311,15 @@ img_filtered = np.fft.ifft2(img_f * filter_f).real
 	\caption[Example listing]{Implementation of a band-pass filter (Equation \ref{eq:gauss-alternative}). $C_{0}$ is the center of the band and $W$ is the width of the band}
 \label{code:bandpass-gauss-alternative}
 \end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+from skimage import exposure
+img_read_image(...)
+img_clahe = return exposure.equalize_adapthist(img_input,kernel_size=[img_input.shape[0]/10,img_input.shape[1]/10],clip_limit=0.00015,nbins=26200)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{CLAHE with scikit-image}
+\label{code:clahe-scikit}
+\end{figure}
