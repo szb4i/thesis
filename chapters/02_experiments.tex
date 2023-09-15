@@ -53,21 +53,61 @@ Following a series of intuitive experiments, the parameters were assigned the fo
 	\item clip\textunderscore limit: set to 0.00015 after rescaling the image to interval [0,1]	
 \end{itemize}
 
-All of the following images in the thesis were post-processed with the \gls{clahe}.
+All of the following images in the thesis were post-processed with \gls{clahe}.
 
 \section{Filtering in Spatial Domain}
 
 \subsection{Sobel kernel}
 
-As noted earlier, Sobel kernels are discretized gradient kernels with dimensions of 3x3. Typically, in the use of this method, a magnitude image is computed using Equation \ref{eq:sobel-magnitued}. By adopting this approach, the results on Figure \ref{fig:prostate-carotis-sobel-magnitude} can be achieved.
+As noted earlier, Sobel kernels are discretised gradient kernels with dimensions of 3x3. Typically, in the use of this method, a magnitude image is computed using Equation \ref{eq:sobel-magnitued}. By adopting this approach, the results on Figure \ref{fig:prostate-carotis-sobel-magnitude} can be achieved.
 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-sobel.png}
   \caption{
-	Sobel magnitude images. $SNR=0.46$
+	Sobel magnitude images.\\\hspace{\textwidth}
+	$\text{SNR}_{left}=0.46$\\\hspace{\textwidth}
+	$\text{SNR}_{right}=0.10$
    }
   \label{fig:prostate-carotis-sobel-magnitude}
 \end{figure}
+
+Instead of acquiring the magnitude image, it may be worthwhile to consider obtaining the arctangent of the gradients in the x and y directions:
+
+ \begin{equation}
+    \theta=\arctan\left(\frac{g_{y}}{g_{x}}\right)
+    \label{eq:sobel-theta}
+ \end{equation}
+ 
+where $\theta$ provides information regarding the direction of the intensity change. When Equation \ref{eq:sobel-theta} is computed for every element of a gradient image $g_{x}$ and $g_{y}$ with dimensions $n \times m$, the result $\theta$ is an inverse tangent image with dimensions $n \times m$. Determining the gradient of the inverse tangent image in both $x$ and $y$ can be expressed as follows:
+
+\begin{equation}
+	g_{\theta x}=\dfrac{\partial \theta}{\partial x}
+    \label{eq:sobel-theta-gradient-x}
+\end{equation}
+\begin{equation}
+	g_{\theta y}=\dfrac{\partial \theta}{\partial y}
+    \label{eq:sobel-theta-gradient-y}
+\end{equation}
+\begin{equation}
+	M_{\theta}(x,y)=\sqrt{g_{\theta x}^{2} + g_{\theta y}^{2}}
+	\label{eq:sobel-theta-gradient-magnitude}
+\end{equation}
+
+The image $M_{\theta}(x,y)$ contains information related to the magnitude of directional changes. If $M_{\theta}$ is small within a kernel, it is likely that it originates from veins. Conversely, when the value of $M_{\theta}$ is large, it is probable that the observed signal primarily consists of noise. This is because in angiography, the anticipated image characteristics are continuous curves. The Python implementation of the method presented before can be found in Code Snippet \ref{code:smart-sobel}. The algorithm was executed on the sample \gls{dva} records, producing the outcomes on Figure \ref{fig:prostate-carotis-sobel-smart}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-sobel-smart.png}
+  \caption{
+	Alternative Sobel filtering\\\hspace{\textwidth}
+	$\text{SNR}_{left}=0.19$\\\hspace{\textwidth}
+	$\text{SNR}_{right}=0.12$
+   }
+  \label{fig:prostate-carotis-sobel-smart}
+\end{figure}
+
+Unfortunately, all of the gradient approaches employed thus far have not produced satisfactory improvements in \gls{dva} imaging. In addition to the suboptimal \gls{snr}, the primary cause of concern is the localised occurrence of signal amplification exclusively at the outer edges of veins. The development of an algorithm that both improves contrast at the periphery and within veins is crucial.
+
 
 \section{Principal Component Analysis (\gls{pca})}\label{section:pca}
