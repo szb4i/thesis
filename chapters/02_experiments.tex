@@ -109,5 +109,25 @@ The image $M_{\theta}(x,y)$ contains information related to the magnitude of dir
 
 Unfortunately, all of the gradient approaches employed thus far have not produced satisfactory improvements in \gls{dva} imaging. In addition to the suboptimal \gls{snr}, the primary cause of concern is the localised occurrence of signal amplification exclusively at the outer edges of veins. The development of an algorithm that both improves contrast at the periphery and within veins is crucial.
 
+\subsection{Adaptive Filtering}
+
+To enhance the \gls{snr}, one potential approach is to employ adaptive filtering as an alternative to the previously examined globally homogeneous spatial filters. This adjustment aims to amplify the information specifically derived from veins, hence potentially improving the overall \gls{snr}. The topic of adaptive filters are extensively covered in Section \ref{subsection:introduction:filtering-in-spatial-domain}. The focus of this section is limited to examining their effect specifically on \gls{dva} images.
+
+The WL operator, previously defined in Equation \ref{eq:local-variance-vectorized} and \ref{eq:wl-matrix}, generates the outputs on Figure \ref{fig:prostate-carotis-wl}. Due to the poor performance of \gls{clahe} in comparison to earlier techniques, additional contrast enhancements were applied using ImageJ \cite{schneider2012nih}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-wl.png}
+  \caption{
+	Adaptive filtering with WL operator\\\hspace{\textwidth}
+	$\text{SNR}_{left}=1.07$\\\hspace{\textwidth}
+	$\text{SNR}_{right}=0.6$
+   }
+  \label{fig:prostate-carotis-wl}
+\end{figure}
+
+Similar to the results obtained from the Sobel kernels shown on Figure \ref{fig:prostate-carotis-sobel-magnitude} and Figure \ref{fig:prostate-carotis-sobel-smart}, the already mentioned concern is also observed in this case.  Signal amplification occurs only at the borders of veins. Furthermore, another disadvantage is the escalated computational expenses associated with the utilisation of adaptive filtering techniques. A potential way to enhance the efficiency of the algorithm is to convert the calculations into vectorized operations, hence leveraging the computational capabilities of NumPy \cite{harris2020array}. Nevertheless,  the presence of amplification exclusively at borders is undesirable, thereby further investment in this technique is unnecessary.
+
+\section{Filtering in Frequency Domain}
 
 \section{Principal Component Analysis (\gls{pca})}\label{section:pca}
