@@ -6,8 +6,10 @@ This appendix contains a list of all Python libraries used in the thesis.
 \begin{itemize}
     \item Python \cite{rossum2009python}
     \item Matplotlib \cite{hunter2007matplotlib}: generating plots
-    \item Numpy \cite{harris2020array}: storing array data structures, several data manipulation methods
+    \item NumPy \cite{harris2020array}: storing array data structures, several data manipulation methods
     \item SciPy \cite{2020SciPy-NMeth}: convolving images with kernels
+	\item scikit-image \cite{scikit-image}: applying \gls{clahe}
+	\item scikit-learn \cite{scikit-learn}: applying \gls{pca}
 \end{itemize}
 
 \chapter{Code Snippets}
@@ -369,3 +371,106 @@ img_gradient_direction_gradient_mangitude_inverted = np.log(
 	\caption[Example listing]{Magnitude of directional changes. \emph{get\textunderscore sobel\textunderscore x\textunderscore kernel} and \emph{get\textunderscore sobel\textunderscore y\textunderscore kernel} can be found in Code Snippet \ref{code:sobel-kernels}}
 \label{code:smart-sobel}
 \end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+from skimage.filters import frangi
+from skimage import morphology
+from sklearn.decomposition import PCA
+def get_pca_filtered_image(img, threshold_variance_ratio):
+  pca = PCA(n_components=img.shape[1])
+  transformed = pca.fit_transform(img)
+  transformed_copy = transformed.copy()
+  for i, variance_ratio in enumerate(pca.explained_variance_ratio_):
+    if variance_ratio < threshold_variance_ratio:
+      transformed_copy[:, i:] = 0
+      break
+  img_pca_filtered = pca.inverse_transform(transformed_copy)
+
+  return img_pca_filtered
+# read in whole sequence of x-ray frames
+img_stack = ...
+img_dva = np.std(img_stack, axis=2, ddof=1)
+img_frangi = frangi(img_dva, black_ridges=True)
+
+### opening: eliminates single pixels (noise removal)
+square = morphology.square(width=2)
+img_morphological_opening = morphology.dilation(
+	morphology.erosion(img_frangi, square)
+)
+img_morphological_opening[0.15 > img_morphological_opening] = 0
+img_morphological_opening[0.15 < img_morphological_opening] = 1
+img_morphological_opening = img_morphological_opening.astype(bool)
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{\gls{pca} filtering part 1}
+\label{code:pca1}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+img_stack_flatten = np.reshape(
+	img_stack,
+	(img_stack.shape[0]*img_stack.shape[1], img_stack.shape[2])
+)
+img_pca_filtered_vein_domain = get_pca_filtered_image(
+	img_stack_flatten[img_morphological_opening.flatten()],
+	1e-05
+)
+img_pca_filtered_background_domain = get_pca_filtered_image(
+	img_stack_flatten[~img_morphological_opening.flatten()], 
+	5e-05
+)
+img_stack_filtered = np.zeros((
+	img_stack.shape[0],
+	img_stack.shape[1],
+	img_stack.shape[2]
+))
+for k in range(0, img_stack.shape[2]):
+  index_vein_domain = 0
+  index_background_domain = 0
+  for i in range(0, img_stack.shape[0]):
+    for j in range(0, img_stack.shape[1]):
+      if img_morphological_opening[i,j]:
+        img_stack_filtered[i,j,k] = img_pca_filtered_vein_domain[
+			index_vein_domain,
+			k
+		]
+        index_vein_domain += 1
+      else:
+        img_stack_filtered[i,j,k] = img_pca_filtered_background_domain[
+			index_background_domain,
+			k
+		]
+        index_background_domain += 1
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{\gls{pca} filtering part 2}
+\label{code:pca2}
+\end{figure}
+
+\begin{figure}[htpb]
+	\begin{tabular}{c}
+	\begin{lstlisting}[language=Python]
+import numpy as np
+W = 0.15
+C0 = 0.25
+sum_weight = 5
+img_f = np.fft.fft2(img)
+v = np.fft.fftfreq(img.shape[0])
+u = np.fft.fftfreq(img.shape[1])
+vv, uu = np.meshgrid(v, u, indexing='ij')
+filter_f = np.exp(-(np.hypot(uu, vv) - C0)**2/(W**2))
+img_filtered = np.fft.ifft2(img_f * filter_f).real
+img_final = img + sum_weight*img_filtered
+img_final = get_clahe_img(scale(img_final))
+	\end{lstlisting}
+	\end{tabular}
+	\caption[Example listing]{The choesen algorithm derived from \ref{code:bandpass-gauss-alternative}. CLAHE function is based on \ref{code:clahe-scikit}}
+\label{code:chosen-algorithm}
+\end{figure}
+
+

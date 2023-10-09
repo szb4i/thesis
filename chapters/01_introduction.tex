@@ -49,7 +49,7 @@ In Angiography, a contrast agent is injected into the blood vessel. The most pop
 
 There are different methods to acquire the final image containing blood vessels only (angiogram). First, the more popular technique, Digital Subtraction Angiography (\gls{dsa}) is discussed.
 
-\subsection{Digital Subtraction Angiography}
+\subsection{Digital Subtraction Angiography} \label{subsection:dsa}
 As digitization of images was introduced and manipulation of digitized information became widely used in the 1970s, Digital Subtraction Angiography (\gls{dsa}) became practical \cite{jeans1990development}. In this method, an image is taken before injecting the contrast agent into the blood vessel. Later, this pre-contrast image is being subtracted from the images acquired at different times during the movement of the contrast agent so that only structures filled with  the agent are visualized and irrelevant anatomic features disappear \cite{levin1984digital}. Such procedure can be seen on Figure \ref{fig:/angio-frames}.
 
 \begin{figure}[htpb]
@@ -63,7 +63,7 @@ As digitization of images was introduced and manipulation of digitized informati
 Unfortunately, the procedure has some drawbacks. The injection of contrast material is one of the most common risks associated with \gls{dsa}. While the material is generally safe, allergic reactions or other adverse reactions are possible \cite{tramer2006pharmacological}. Another concern is the radiation exposure induced by X-rays, which should always be minimized in medical applications \cite{lange2006randomized}. Digital variance angiography is a viable solution to these issues.
 
 
-\subsection{Digital Variance Angiography}
+\subsection{Digital Variance Angiography} \label{subsection:dva}
 
 The key benefit of Digital variance angiography (\gls{dva}) is the new motion-based contrast scheme it introduces, which enables the visualization of structures that are not visible in a traditional X-ray image. Instead of capturing a single fully exposed image during the procedure, several underexposed images are taken. By calculating the variance and the mean for every pixel, two types of images can be obtained. The expected value of the X-ray attenuation represents the static image, which contains the same type of information as the conventional X-ray image. On the other hand,  the variance of the X-ray attenuation represents a new type of image, named kinetic image, reflecting internal motions \cite{szigeti2014motion}.
 
@@ -157,7 +157,7 @@ However, when the approach is applied globally, the final output might not be as
   \label{fig:/global-hist-eq}
 \end{figure}
 
-The suggested approach is called \gls{clahe} (Contrast Limited Adaptive Histogram Equalization) \cite{pizer1987adaptive}. Instead of equalizing the histogram globally, the image is partitioned into equal-sized regions known as tiles, each of which is subjected to individual histogram equalization as previously demonstrated. By simply doing so, noise might be amplified in near-constant regions. To prevent this, before applying histogram equalization, pixels that are above the given contrast limit in any histogram bin are clipped and evenly distributed to other bins. Finally, tile boundary artifacts are eliminated using bilinear interpolation. The outcome is shown in Figure \ref{fig:/intro-clahe}. While histogram equalization enhanced successfully the visibility of the dark background, there was also a slight improvement in the visibility of the face in the foreground.
+The suggested approach is called \gls{clahe} (Contrast Limited Adaptive Histogram Equalization) \cite{pizer1987adaptive}. Instead of equalizing the histogram globally, the image is partitioned into equal-sized regions known as tiles, each of which is subjected to individual histogram equalization as previously demonstrated. By simply doing so, noise might be amplified in near-constant regions. To prevent this, before applying histogram equalization, pixels that are above the given contrast limit in any histogram bin are clipped and evenly distributed to other bins. Finally, tile boundary artefacts are eliminated using bilinear interpolation. The outcome is shown in Figure \ref{fig:/intro-clahe}. While histogram equalization enhanced successfully the visibility of the dark background, there was also a slight improvement in the visibility of the face in the foreground.
 
 \begin{figure}[htpb]
   \centering
@@ -426,7 +426,7 @@ Consider a noisy image as in case of Figure \ref{fig:sobel-vs-wl-noisy}. Compare
 
 The methods that were previously discussed are rather expensive in terms of computation costs if the algorithm is not well optimized. In the next section, a different filtering perspective is discussed which is typically faster than the former and offers a new approach to handle image components with various frequencies.
 
-\subsection{Filtering in Frequency Domain}
+\subsection{Filtering in Frequency Domain} \label{subsection:introduction:filtering-in-frequency-domain}
 
 The following description of the Fourier domain is based on Book \cite{gonzalez2018digital}.  A function $f(t)$ of a continuous variable $t$ that is periodic with a period $T$ can be expressed as the sum of sines and cosines:
 
@@ -513,7 +513,7 @@ Sufficient separation of a periodic sequence is possible if the following condit
 	\label{eq:nyquist}
 \end{equation}
 
-It is called the sampling theorem and $\mu_{max}=\frac{1}{2\triangle T}$ is the Nyquist rate which is the minimum frequency required for sufficient recovery. If the above condition is not fulfilled different signals may become indistinguishable. This artifact is known as aliasing.
+It is called the sampling theorem and $\mu_{max}=\frac{1}{2\triangle T}$ is the Nyquist rate which is the minimum frequency required for sufficient recovery. If the above condition is not fulfilled different signals may become indistinguishable. This artefact is known as aliasing.
 
 The previously mentioned theorems can be extended to two dimension space which can be investigated further in Book \cite{gonzalez2018digital}.  Here, only the 2D discrete Fourier transform and its inverse are written respectively as follows:
 
@@ -574,7 +574,7 @@ where $D(u,v)$ is the distance from the center of the frequency domain and $D_{0
   \label{fig:tree-ilpf}
 \end{figure}
 
-Unfortunately, there is a substantial ringing artifact on the output image (right image on Figure \ref{fig:tree-ilpf}). To better understand the issue, it is necessary to observe the spatial domain kernel of the \gls{ilpf} obtained by calculating the inverse discrete Fourier transform of \gls{ilpf} in frequency domain. An illustration can be seen on Figure \ref{fig:ilpf-ringing}.
+Unfortunately, there is a substantial ringing artefact on the output image (right image on Figure \ref{fig:tree-ilpf}). To better understand the issue, it is necessary to observe the spatial domain kernel of the \gls{ilpf} obtained by calculating the inverse discrete Fourier transform of \gls{ilpf} in frequency domain. An illustration can be seen on Figure \ref{fig:ilpf-ringing}.
 
 \begin{figure}[htpb]
   \centering
@@ -587,14 +587,14 @@ Unfortunately, there is a substantial ringing artifact on the output image (righ
   \label{fig:ilpf-ringing}
 \end{figure}
 
-As a reminder, filtering in the spatial domain is accomplished by convolving the center function in Figure \ref{fig:ilpf-ringing} with the image.  Ringing is primarily caused by the outer part of this spatial function, while blurring is mainly done by the center. The \gls{ilpf} has to be replaced by a function that remains unchanged after an inverse Fourier transform in order to leave the undesirable ringing artifact. An adequate function is Gaussian which can be expressed as follows:
+As a reminder, filtering in the spatial domain is accomplished by convolving the center function in Figure \ref{fig:ilpf-ringing} with the image.  Ringing is primarily caused by the outer part of this spatial function, while blurring is mainly done by the center. The \gls{ilpf} has to be replaced by a function that remains unchanged after an inverse Fourier transform in order to leave the undesirable ringing artefact. An adequate function is Gaussian which can be expressed as follows:
 
 \begin{equation}
 	H(u, v)= e^{-D^{2}(u,v)/2\sigma ^{2}}
 	\label{eq:glpf}
 \end{equation}
 
-where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artifact is eliminated while the blurring is accomplished successfully. 
+where $D(u,v)$ is the distance from the center of the frequency domain and $\sigma$ is a measure of spread about the center. Replacing \gls{ilpf} with Gaussian low-pass filter (\gls{glpf}), the result is shown on Figure \ref{fig:tree-glpf}. As it can be noticed, the unwanted ringing artefact is eliminated while the blurring is accomplished successfully. 
 
 \begin{figure}[htpb]
   \centering
@@ -662,7 +662,7 @@ Switching to an alternative Gaussian could be a viable solution if thinner band 
 	\label{eq:gauss-alternative}
 \end{equation}
 
-where $C_{0}$ is the center of the band and $W$ is the width of the band. Application is shown on Figure \ref{fig:tree-bandpass-gauss-alternative}. Comparing the middle images of Figure \ref{fig:tree-bandpass-gauss-alternative} and \ref{fig:tree-bandpass-gauss-diff}, it can be noticed that the prior provides a thinner band. However, by widening $W$, the earlier shown ringing artifact (see Figure \ref{fig:tree-ilpf}) is starting to appeal.
+where $C_{0}$ is the center of the band and $W$ is the width of the band. Application is shown on Figure \ref{fig:tree-bandpass-gauss-alternative}. Comparing the middle images of Figure \ref{fig:tree-bandpass-gauss-alternative} and \ref{fig:tree-bandpass-gauss-diff}, it can be noticed that the prior provides a thinner band. However, by widening $W$, the earlier shown ringing artefact (see Figure \ref{fig:tree-ilpf}) is starting to appeal.
 
 \begin{figure}[htpb]
   \centering
@@ -678,7 +678,7 @@ where $C_{0}$ is the center of the band and $W$ is the width of the band. Applic
 As it has been demonstrated in this chapter, frequency domain filtering is a crucial technique along with spatial domain filtering. When one needs to highlight visual elements with particular frequencies, frequency domain filtering is a more obvious choice. In case of large images, filtering in frequency domain performs computationally far more effectively than sliding across the entire image in spatial domain. There are other filtering perspectives that do not fit into either of the previous chapters. Next, these techniques are introduced.
 
 
-\subsection{Enhancement with Principal Component Analysis}
+\subsection{Enhancement with Principal Component Analysis}\label{subsection:introduction:pca}
 
 Principal Component Analysis (\gls{pca}) is regarded by many as a highly prevalent dimension reduction technique. In order to raise comprehensibility of the method, it is practical to look into the process within a two-dimensional context \cite{gagneur2002data}.
 

@@ -11,8 +11,8 @@ In order to test the efficiency of the techniques, the present thesis uses the f
   \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-clahe.png}
   \caption{
 	Sample \gls{dva} records with marked \gls{roi}s\\\hspace{\textwidth}
-	Blue rectangles: \gls{roi} inside vein (signal)\\\hspace{\textwidth}
-	Red rectangles: \gls{roi} outside vein (noise)
+	Blue rectangles: \gls{roi} inside blood vessel (signal)\\\hspace{\textwidth}
+	Red rectangles: \gls{roi} outside blood vessel (noise)
    }
   \label{fig:prostate-carotis-clahe}
 \end{figure}
@@ -28,11 +28,11 @@ The signal-to-noise ratio \gls{snr}  model used to perform quantitative analysis
  \end{equation}
 
 
-where $\mu_{a}$ is the signal mean measured in region of interest (\gls{roi}) $a$, $\mu_{b}$ is the signal mean measured in \gls{roi} $b$ and $\sigma_{b}$ is the standard deviation of the noise measure in \gls{roi} $b$. \gls{roi} $a$ areas are regions inside veins (colour blue on Figure \ref{fig:prostate-carotis}) while \gls{roi} $b$ areas are regions outside veins (colour red on Figure \ref{fig:prostate-carotis}). \gls{snr} is calculated in $n$ different regions and their arithmetic mean is calculated to represent the effectiveness of an algorithm with simply one quantity.  The \gls{roi} is evaluated in $n$ distinct regions and the representative measure of efficiency is obtained by computing the weighted arithmetic mean of these values. The $A_{i}$ weighting factors used in this calculation correspond to the areas of the distinct \gls{roi}s. This approach allows for encapsulating the quality of the algorithm into a single quantity.
+where $\mu_{a}$ is the signal mean measured in the region of interest (\gls{roi}) $a$, $\mu_{b}$ is the signal mean measured in \gls{roi} $b$ and $\sigma_{b}$ is the standard deviation of the noise measured in \gls{roi} $b$. \gls{roi} $a$ areas are regions inside blood vessels (colour blue on Figure \ref{fig:prostate-carotis}) while \gls{roi} $b$ areas are regions outside blood vessels (colour red on Figure \ref{fig:prostate-carotis}). \gls{snr} is calculated in $n$ different regions and their arithmetic mean is calculated to represent the effectiveness of an algorithm with simply one quantity.  The \gls{roi} is evaluated in $n$ distinct regions and the representative measure of efficiency is obtained by computing the weighted arithmetic mean of these values. The $A_{i}$ weighting factors used in this calculation correspond to the areas of the distinct \gls{roi}s. This approach allows for encapsulating the quality of the algorithm into a single quantity.
 
 According to the Rose criterion, it is necessary to have \gls{snr} of at least 5 in order to confidently differentiate visual details.  \gls{snr} below 5 indicates a level of certainty in recognising visual details that is below 100\% \cite{bushberg2011essential}. In addition to running SNR measurements, the evaluation of algorithm outcomes is performed by medical specialists too.
 
-\section{Contrast Limited Adaptive Histogram Equalisation (\gls{clahe})}
+\section{Contrast Limited Adaptive Histogram Equalisation (\gls{clahe})} \label{section:clahe}
 
 As noted in Chapter \ref{subsection:intensity-transformations}, Contrast Limited Adaptive Histogram Equalisation (\gls{clahe}) is a highly effective technique due to its ability to do histogram equalisation on a local scale, namely on a tile-by-tile level. On Figure \ref{fig:prostate-carotis-clahe}, the \gls{clahe} enhanced image is displayed. In the absence of such enhancement, the \gls{dva} records would appear as seen on Figure \ref{fig:prostate-carotis}.
 
@@ -94,7 +94,7 @@ where $\theta$ provides information regarding the direction of the intensity cha
 	\label{eq:sobel-theta-gradient-magnitude}
 \end{equation}
 
-The image $M_{\theta}(x,y)$ contains information related to the magnitude of directional changes. If $M_{\theta}$ is small within a kernel, it is likely that it originates from veins. Conversely, when the value of $M_{\theta}$ is large, it is probable that the observed signal primarily consists of noise. This is because in angiography, the anticipated image characteristics are continuous curves. The Python implementation of the method presented before can be found in Code Snippet \ref{code:smart-sobel}. The algorithm was executed on the sample \gls{dva} records, producing the outcomes on Figure \ref{fig:prostate-carotis-sobel-smart}.
+The image $M_{\theta}(x,y)$ contains information related to the magnitude of directional changes. If $M_{\theta}$ is small within a kernel, it is likely that it originates from blood vessels. Conversely, when the value of $M_{\theta}$ is large, it is probable that the observed signal primarily consists of noise. This is because in angiography, the anticipated image characteristics are continuous curves. The Python implementation of the method presented before can be found in Code Snippet \ref{code:smart-sobel}. The algorithm was executed on the sample \gls{dva} records, producing the outcomes on Figure \ref{fig:prostate-carotis-sobel-smart}.
 
 \begin{figure}[htpb]
   \centering
@@ -107,11 +107,11 @@ The image $M_{\theta}(x,y)$ contains information related to the magnitude of dir
   \label{fig:prostate-carotis-sobel-smart}
 \end{figure}
 
-Unfortunately, all of the gradient approaches employed thus far have not produced satisfactory improvements in \gls{dva} imaging. In addition to the suboptimal \gls{snr}, the primary cause of concern is the localised occurrence of signal amplification exclusively at the outer edges of veins. The development of an algorithm that both improves contrast at the periphery and within veins is crucial.
+Unfortunately, all of the gradient approaches employed thus far have not produced satisfactory improvements in \gls{dva} imaging. In addition to the suboptimal \gls{snr}, the primary cause of concern is the localised occurrence of signal amplification exclusively at the outer edges of blood vessels. The development of an algorithm that both improves contrast at the periphery and within blood vessels is crucial.
 
 \subsection{Adaptive Filtering}
 
-To enhance the \gls{snr}, one potential approach is to employ adaptive filtering as an alternative to the previously examined globally homogeneous spatial filters. This adjustment aims to amplify the information specifically derived from veins, hence potentially improving the overall \gls{snr}. The topic of adaptive filters are extensively covered in Section \ref{subsection:introduction:filtering-in-spatial-domain}. The focus of this section is limited to examining their effect specifically on \gls{dva} images.
+To enhance the \gls{snr}, one potential approach is to employ adaptive filtering as an alternative to the previously examined globally homogeneous spatial filters. This adjustment aims to amplify the information specifically derived from blood vessels, hence potentially improving the overall \gls{snr}. The topic of adaptive filters are extensively covered in Section \ref{subsection:introduction:filtering-in-spatial-domain}. The focus of this section is limited to examining their effect specifically on \gls{dva} images.
 
 The WL operator, previously defined in Equation \ref{eq:local-variance-vectorized} and \ref{eq:wl-matrix}, generates the outputs on Figure \ref{fig:prostate-carotis-wl}. Due to the poor performance of \gls{clahe} in comparison to earlier techniques, additional contrast enhancements were applied using ImageJ \cite{schneider2012nih}.
 
@@ -126,8 +126,114 @@ The WL operator, previously defined in Equation \ref{eq:local-variance-vectorize
   \label{fig:prostate-carotis-wl}
 \end{figure}
 
-Similar to the results obtained from the Sobel kernels shown on Figure \ref{fig:prostate-carotis-sobel-magnitude} and Figure \ref{fig:prostate-carotis-sobel-smart}, the already mentioned concern is also observed in this case.  Signal amplification occurs only at the borders of veins. Furthermore, another disadvantage is the escalated computational expenses associated with the utilisation of adaptive filtering techniques. A potential way to enhance the efficiency of the algorithm is to convert the calculations into vectorized operations, hence leveraging the computational capabilities of NumPy \cite{harris2020array}. Nevertheless,  the presence of amplification exclusively at borders is undesirable, thereby further investment in this technique is unnecessary.
+Similar to the results obtained from the Sobel kernels shown on Figure \ref{fig:prostate-carotis-sobel-magnitude} and Figure \ref{fig:prostate-carotis-sobel-smart}, the already mentioned concern is also observed in this case.  Signal amplification occurs only at the borders of blood vessels. Furthermore, another disadvantage is the escalated computational expenses associated with the utilisation of adaptive filtering techniques. A potential way to enhance the efficiency of the algorithm is to convert the calculations into vectorized operations, hence leveraging the computational capabilities of NumPy \cite{harris2020array}. Nevertheless,  the presence of amplification exclusively at borders is undesirable, thereby further investment in this technique is unnecessary.
 
 \section{Filtering in Frequency Domain}
 
+Filtering in frequency domain is a potentially advantageous approach for signal enhancement in the vessel region. If the goal is to highlight characteristics within a limited range of widths, a bandpass filter with appropriate parameters can serve as a proper choice.
+
+\subsection{Bandpass Filtering}\label{subsection:bandpass-filtering}
+
+The topic of bandpass filtering is extensively covered in Section \ref{subsection:introduction:filtering-in-frequency-domain}. The focus of this section is limited to examining their effect exclusively on \gls{dva} images.
+
+Given the known area of interest regarding blood vessels, it is therefore possible to amplify the signal originating from that certain frequency range. As previously mentioned in Section \ref{subsection:introduction:filtering-in-frequency-domain}, the utilisation of \gls{ilpf} described in Equation \ref{eq:ilpf} is considered inadequate in medical contexts due to the potential generation of false vessels caused by the presence of the ringing artefact. If Equation \ref{eq:gauss-alternative} is appropriately parameterized, it is possible to completely eliminate the presence of ringing artefacts. Additionally, this alternative formulation allows the creation of a bandpass filter that is narrower compared to the one generated using conventional Gaussians as described in Equation \ref{eq:gauss-diff}. Code Snippet \ref{code:bandpass-gauss-alternative} reveals the details of implementation. The results are displayed on Figure \ref{fig:prostate-carotis-bandpass}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-bandpass.png}
+  \caption{
+	Bandpass filtering. $C_0=0.25$ and $W=0.15$\\\hspace{\textwidth}
+	$\text{SNR}_{left}=0.32$\\\hspace{\textwidth}
+	$\text{SNR}_{right}=0.09$
+   }
+  \label{fig:prostate-carotis-bandpass}
+\end{figure}
+
+Signal amplification seems to occur both in the peripheral regions and within the blood vessels. Moreover, thinner vessels are almost as visible wider ones. By using a parameterization to Equation \ref{eq:gauss-alternative} in a modest manner, the presence of the ringing artefact is effectively eliminated. The present approach demonstrates its efficiency in enhancing vessel features while preserving computational cost, making it a viable candidate for integration into the post-processing stages of the \gls{dva} software.
+
 \section{Principal Component Analysis (\gls{pca})}\label{section:pca}
+
+The topic of \gls{pca} is extensively covered in Section \ref{subsection:introduction:pca}. Here, a possible approach of the \gls{dva} application is revealed.
+
+So far, the preceding methodologies have utilised the final kinetic image as an input, as described in Section \ref{subsection:dva}. Instead of computing the kinetic image from the captured frames of the angiogram, the application of  \gls{pca} could be employed for vessel identification. \gls{pca} is widely recognised for its ability to achieve optimal energy compaction, wherein a significant proportion of the energy is concentrated in only a handful of coefficients. In this context, the concept of energy relates to the characteristics of visual data, specifically the magnitude of brightness and the degree of change in brightness among adjacent pixels. 
+
+The complete angiographic measurement can be conceptualised as a collection of $N$ two-dimensional X-ray images, forming a three-dimensional vector. Each dimension of the vector represents the following:
+
+\begin{itemize}
+	\item $x$: width of the X-ray frames
+	\item $y$: height of the X-ray frames
+	\item $z$: time domain. In case of a measurement with $N$ frames, the length of the this dimension is $N$
+\end{itemize}
+
+Then, the vector undergoes a transformation into the \gls{pca} domain. The basic idea is that by retaining only a small number of principal components with high variance ratios, the signal originating from blood vessels is selectively preserved while the noise is effectively eliminated \cite{lee2016low}.
+
+The full algorithm is formed by including the steps that follow:
+\begin{itemize}
+	\item It is important to distinguish prominent vessels from the background. It is accomplished by applying Frangi filter \cite{frangi1998multiscale} with morphological opening \cite{gonzalez2018digital} on the \gls{dva} image.
+	\item Next, the \gls{pca} transformation is performed individually on the two domains, and the components having a variance ratio below the predetermined threshold are eliminated.
+	\item Finally, the output is a three-dimensional vector that contains all the \gls{pca} filtered x-ray frames. From this sequence, a \gls{dsa} or \gls{dva} image can be created with the methods were discussed in Section \ref{subsection:dsa} and \ref{subsection:dva} respectively.
+\end{itemize}
+
+The relevant code can be found in Code Snippet \ref{code:pca1} and \ref{code:pca2}. The efficiency of the technique is demonstrated on Figure \ref{fig:pca-good}. It can be seen that the algorithm significantly reduces background noise while preserving blood vessels. Unfortunately, optimal performance is dependent on having enough number of image frames during the measurement process. In case of Figure \ref{fig:pca-good}, 72 x-ray images are obtained. One of the primary objectives of \gls{dva} is the mitigation of radiation exposure, therefore collecting such a large number of records is deemed unacceptable. When the number of acquired image frames is decreased, the result is less convincing as it is shown on Figure \ref{fig:pca-bad}. COMPLETE SUMMARY OF THE METHOD!!!
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/pca-good.png}
+  \caption{
+	Left: Before \gls{pca} filtering\\\hspace{\textwidth}
+	Right: After \gls{pca} filtering\\\hspace{\textwidth}
+   }
+  \label{fig:pca-good}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/pca-bad.png}
+  \caption{
+	Left: Before \gls{pca} filtering\\\hspace{\textwidth}
+	Right: After \gls{pca} filtering\\\hspace{\textwidth}
+   }
+  \label{fig:pca-bad}
+\end{figure}
+
+
+
+\section{The Chosen Algorithm}\label{section:the-chosen-algorithm}
+
+Following several rounds of conversation, experts selected the technique outlined in Section \ref{subsection:bandpass-filtering}. The values of the adjustable parameters are currently undetermined although they can be modified to satisfy various predefined user configurations. Here, an applicable implementation of the complete algorithm is described. The final output is shown on Figure \ref{fig:prostate-carotis-final}. As a reference for comparison, Figure \ref{fig:prostate-carotis-comparison} displays the unprocessed \gls{dva} image.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis.png}
+  \caption{
+	Unprocessed \gls{dva} images
+   }
+  \label{fig:prostate-carotis-comparison}
+\end{figure}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/experiments/prostate-carotis-final.png}
+  \caption{
+	Bandpass filtering. $C_0=0.25$ and $W=0.15$\\\hspace{\textwidth}
+	$\text{SNR}_{left}=0.32$\\\hspace{\textwidth}
+	$\text{SNR}_{right}=0.09$
+   }
+  \label{fig:prostate-carotis-final}
+\end{figure}
+
+The algorithm can be divided to the following steps:
+\begin{itemize}
+	\item The bandpass image is obtained the way described in \ref{subsection:bandpass-filtering}. At this stage, \gls{clahe} is not applied yet.
+	\item Next, the bandpass image is added to the original image with a weight factor of $5$. This weight factor becomes another tunable parameter of the final algorithm.
+	\item Finally, \gls{clahe} is applied with the parameter selection specified in Section \ref{section:clahe}.
+\end{itemize}
+
+The implementation details can be found in Code Snippet \ref{code:chosen-algorithm}. In summary, the adjustable parameters are as follows:
+\begin{itemize}
+	\item sum\textunderscore weight: Weight of bandpass image compared to original
+	\item C0: Center of the band (see details in Equation \ref{eq:gauss-alternative})
+	\item W: Width of the band (see details in Equation \ref{eq:gauss-alternative})
+	\item \gls{clahe} parameters: Described in Section \ref{section:clahe}
+\end{itemize}
+
+By employing this form of bandpass filtering, considerable enhancements can be accomplished. Increasing the weight parameter results in enhanced visibility of the smaller vessels. However, this adjustment also leads to a growth in noise and alters the overall contrast of the image. Additionally, it is necessary to adjust the $C_0$ and $W$ parameters carefully to prevent the occurrence of ringing artefacts.
