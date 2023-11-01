@@ -162,7 +162,7 @@ The complete angiographic measurement can be conceptualised as a collection of $
 \begin{itemize}
 	\item $x$: width of the X-ray frames
 	\item $y$: height of the X-ray frames
-	\item $z$: time domain. In case of a measurement with $N$ frames, the length of the this dimension is $N$
+	\item $z$: time domain. In case of a measurement with $N$ frames, the size of the this dimension is $N$
 \end{itemize}
 
 Then, the vector undergoes a transformation into the \gls{pca} domain. The basic idea is that by retaining only a small number of principal components with high variance ratios, the signal originating from blood vessels is selectively preserved while the noise is effectively eliminated \cite{lee2016low}.
@@ -171,10 +171,10 @@ The full algorithm is formed by including the steps that follow:
 \begin{itemize}
 	\item It is important to distinguish prominent vessels from the background. It is accomplished by applying Frangi filter \cite{frangi1998multiscale} with morphological opening \cite{gonzalez2018digital} on the \gls{dva} image.
 	\item Next, the \gls{pca} transformation is performed individually on the two domains, and the components having a variance ratio below the predetermined threshold are eliminated.
-	\item Finally, the output is a three-dimensional vector that contains all the \gls{pca} filtered x-ray frames. From this sequence, a \gls{dsa} or \gls{dva} image can be created with the methods were discussed in Section \ref{subsection:dsa} and \ref{subsection:dva} respectively.
+	\item After performing inverse \gls{pca} transformation, the output is a three-dimensional vector that contains all the \gls{pca} filtered x-ray frames. From this sequence, a \gls{dsa} or \gls{dva} image can be created with the methods discussed in Section \ref{subsection:dsa} and \ref{subsection:dva} respectively.
 \end{itemize}
 
-The relevant code can be found in Code Snippet \ref{code:pca1} and \ref{code:pca2}. The efficiency of the technique is demonstrated on Figure \ref{fig:pca-good}. It can be seen that the algorithm significantly reduces background noise while preserving blood vessels. Unfortunately, optimal performance is dependent on having enough number of image frames during the measurement process. In case of Figure \ref{fig:pca-good}, 72 x-ray images are obtained. One of the primary objectives of \gls{dva} is the mitigation of radiation exposure, therefore collecting such a large number of records is deemed unacceptable. When the number of acquired image frames is decreased, the result is less convincing as it is shown on Figure \ref{fig:pca-bad}. COMPLETE SUMMARY OF THE METHOD!!!
+The relevant code can be found in Code Snippet \ref{code:pca1} and \ref{code:pca2}. The efficiency of the technique is demonstrated on Figure \ref{fig:pca-good}. It can be seen that the algorithm significantly reduces background noise while preserving blood vessels. Unfortunately, optimal performance is dependent on having enough number of image frames during the measurement process. In case of Figure \ref{fig:pca-good}, 72 x-ray images are obtained. One of the primary objectives of \gls{dva} is the mitigation of radiation exposure, therefore collecting such a large number of records is considered unacceptable. When the number of acquired image frames is decreased, the result is less convincing as it is shown on Figure \ref{fig:pca-bad}, where only 7 frames were captured. In terms of computational efficiency, the execution time required for performing a \gls{pca} transformation is significantly higher compared to a Fourier transformation. However, it should be acknowledged that the presented code snippets could potentially be further optimised for improved performance. Finally, the primary aim of the research is to boost blood vessel visibility. Nevertheless, this particular method performs well in reducing noise. Consequently, it is deemed unnecessary to invest more effort to further investigation of this approach.
 
 \begin{figure}[htpb]
   \centering
